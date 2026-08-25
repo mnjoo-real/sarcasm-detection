@@ -138,6 +138,143 @@ def rhythm_features(sound: parselmouth.Sound) -> dict:
     }
 
 
+# --- Rhythm pattern features --------------------------------------------------
+# Rhythm = how note/rest *durations* combine into a regular or irregular
+# pattern over time (long-short), plus how *strong/weak* those beats are
+# (accent). Distinct from speaking_rate_proxy/energy_std above, which measure
+# overall tempo and loudness variability but not the pattern of contrast
+# between consecutive intervals or beats.
+
+def _interval_durations(f0_track: np.ndarray, hop_s: float):
+    """Durations (s) of contiguous voiced and unvoiced runs, in temporal order.
+
+    A speech-rhythm-literature proxy for vocalic vs. intervocalic intervals
+    (used the same way in PVI studies of speech rhythm, e.g. Grabe & Low 2002).
+    """
+    voiced = f0_track > 0
+    if len(voiced) == 0:
+        return [], []
+    durations = {True: [], False: []}
+    current, length = voiced[0], 1
+    for v in voiced[1:]:
+        if v == current:
+            length += 1
+        else:
+            durations[current].append(length * hop_s)
+            current, length = v, 1
+    durations[current].append(length * hop_s)
+    return durations[True], durations[False]
+
+
+def _npvi(durations) -> float:
+    """Normalized Pairwise Variability Index (Grabe & Low 2002): how much
+    consecutive interval durations differ, relative to their size. High =
+    contrastive/irregular long-short pattern; low = evenly-timed."""
+    if len(durations) < 2:
+        return np.nan
+    d = np.array(durations)
+    d1, d2 = d[:-1], d[1:]
+    denom = (d1 + d2) / 2
+    valid = denom > 0
+    if not np.any(valid):
+        return np.nan
+    return float(100 * np.mean(np.abs(d1[valid] - d2[valid]) / denom[valid]))
+
+
+def _rpvi(durations) -> float:
+    """Raw Pairwise Variability Index (unnormalized, standard for consonantal/
+    pause intervals in the speech-rhythm literature)."""
+    if len(durations) < 2:
+        return np.nan
+    d = np.array(durations)
+    return float(np.mean(np.abs(d[:-1] - d[1:])))
+
+
+def rhythm_pattern_features(sound: parselmouth.Sound, hop_s: float = 0.02) -> dict:
+    pitch = sound.to_pitch(time_step=hop_s)
+    f0_track = pitch.selected_array["frequency"]
+    voiced_durs, unvoiced_durs = _interval_durations(f0_track, hop_s)
+
+    intensity = sound.to_intensity()
+    values = intensity.values[0]
+    values = values[np.isfinite(values)]
+    time_step = intensity.time_step
+
+    stress_contrast, ioi_cv, ioi_npvi = np.nan, np.nan, np.nan
+    if len(values) > 0:
+        threshold = np.mean(values) - 3
+        min_distance = max(int(0.08 / time_step), 1)
+        peaks, _ = find_peaks(values, height=threshold, distance=min_distance)
+
+        if len(peaks) > 1:
+            # How much consecutive beats alternate strong/weak (not peak-vs-
+            # silence loudness, which is a different, unrelated quantity).
+            peak_heights = values[peaks]
+            stress_contrast = float(np.mean(np.abs(np.diff(peak_heights))))
+
+        if len(peaks) > 2:
+            iois = np.diff(peaks) * time_step
+            if np.mean(iois) > 0:
+                ioi_cv = float(np.std(iois) / np.mean(iois))
+            # ioi_cv is a *global* variability measure, so a single outlier
+            # (e.g. utterance-final lengthening, unrelated to sarcasm) can
+            # dominate it. ioi_npvi only compares each IOI to its immediate
+            # neighbor, so one boundary outlier affects just one pair instead
+            # of the whole statistic.
+            ioi_npvi = _npvi(iois)
+
+    min_pause_s = 0.10  # below this is almost certainly a consonant closure, not a real pause
+    real_pauses = [d for d in unvoiced_durs if d >= min_pause_s]
+
+    return {
+        "npvi_voiced": _npvi(voiced_durs),
+        "rpvi_pause": _rpvi(unvoiced_durs),
+        "rpvi_pause_filtered": _rpvi(real_pauses),
+        "stress_contrast": stress_contrast,
+        "ioi_cv": ioi_cv,
+        "ioi_npvi": ioi_npvi,
+    }
+
+
+def pitch_stress_contrast_features(sound: parselmouth.Sound, hop_s: float = 0.02,
+                                    ref_freq: float = 440.0) -> dict:
+    """Pitch-accent analogue of stress_contrast: how much F0 (in semitones)
+    differs between consecutive syllable-nucleus peaks, rather than loudness.
+
+    Loudness-based stress_contrast can be confounded by per-recording gain/mic
+    differences even after show-normalization; pitch accent is a second,
+    largely independent marker of prominence in speech and isn't tied to
+    absolute recording level.
+    """
+    intensity = sound.to_intensity()
+    values = intensity.values[0]
+    times = intensity.ts()
+    valid = np.isfinite(values)
+    values, times = values[valid], times[valid]
+
+    if len(values) == 0:
+        return {"pitch_stress_contrast": np.nan}
+
+    threshold = np.mean(values) - 3
+    min_distance = max(int(0.08 / intensity.time_step), 1)
+    peaks, _ = find_peaks(values, height=threshold, distance=min_distance)
+
+    if len(peaks) < 2:
+        return {"pitch_stress_contrast": np.nan}
+
+    pitch = sound.to_pitch(time_step=hop_s)
+    peak_semitones = []
+    for idx in peaks:
+        f0 = pitch.get_value_at_time(times[idx])
+        if f0 is not None and not np.isnan(f0) and f0 > 0:
+            peak_semitones.append(12 * np.log2(f0 / ref_freq))
+
+    if len(peak_semitones) < 2:
+        return {"pitch_stress_contrast": np.nan}
+
+    return {"pitch_stress_contrast": float(np.mean(np.abs(np.diff(peak_semitones))))}
+
+
 # --- Harmony features over the whole utterance ------------------------------
 
 def harmony_features(sound: parselmouth.Sound, frame_length_s: float = 0.04,
@@ -311,6 +448,142 @@ def scale_features_fine(sound: parselmouth.Sound, n_bins: int = 60, hop_s: float
     }
 
 
+# --- Melody features ---------------------------------------------------------
+# Melody = pitch movement organized in time (with rhythm), as distinct from
+# harmony (simultaneous pitch relationships, covered above) and from the
+# static F0 mean/std/range already in prosody_features. Two complementary
+# views: (A) continuous contour shape/activity, (B) a discretized "note"
+# sequence (via stable-region segmentation) and its interval structure.
+
+def _voiced_runs(f0_track: np.ndarray):
+    """Yields (start, end) index pairs for each contiguous run of voiced frames."""
+    voiced = f0_track > 0
+    runs = []
+    start = None
+    for i, v in enumerate(voiced):
+        if v and start is None:
+            start = i
+        elif not v and start is not None:
+            runs.append((start, i))
+            start = None
+    if start is not None:
+        runs.append((start, len(voiced)))
+    return runs
+
+
+def melody_contour_features(sound: parselmouth.Sound, hop_s: float = 0.02,
+                             ref_freq: float = 440.0, min_step_semitone: float = 0.1) -> dict:
+    """Continuous-contour melody features: how much and which way the pitch moves.
+
+    min_step_semitone filters out frame-to-frame jitter: Praat's pitch tracker
+    introduces sub-0.1-semitone noise even on a perfectly held tone, and without
+    a floor, direction_change_rate ends up counting jitter reversals rather than
+    real melodic turns (confirmed via the synthetic 4-note sanity check below).
+    """
+    pitch = sound.to_pitch(time_step=hop_s)
+    f0_track = pitch.selected_array["frequency"]
+    times = pitch.ts()
+    duration = sound.get_total_duration()
+
+    total_path = 0.0
+    direction_changes = 0
+    all_t, all_s = [], []
+
+    for start, end in _voiced_runs(f0_track):
+        if end - start < 2:
+            continue
+        seg_semitone = 12 * np.log2(f0_track[start:end] / ref_freq)
+        seg_t = times[start:end]
+        diffs = np.diff(seg_semitone)
+        total_path += float(np.sum(np.abs(diffs)))
+
+        significant = diffs[np.abs(diffs) > min_step_semitone]
+        signs = np.sign(significant)
+        if len(signs) > 1:
+            direction_changes += int(np.sum(signs[1:] != signs[:-1]))
+
+        all_t.extend(seg_t)
+        all_s.extend(seg_semitone)
+
+    if len(all_t) < 2:
+        return {"melodic_path_length": np.nan, "direction_change_rate": np.nan,
+                "contour_slope": np.nan, "final_initial_diff": np.nan}
+
+    all_t, all_s = np.array(all_t), np.array(all_s)
+    slope = float(np.polyfit(all_t, all_s, 1)[0])
+
+    return {
+        "melodic_path_length": total_path / duration if duration > 0 else np.nan,
+        "direction_change_rate": direction_changes / duration if duration > 0 else np.nan,
+        "contour_slope": slope,
+        "final_initial_diff": float(all_s[-1] - all_s[0]),
+    }
+
+
+def segment_notes(f0_track: np.ndarray, times: np.ndarray, ref_freq: float = 440.0,
+                   velocity_thresh: float = 8.0, min_note_duration: float = 0.05,
+                   hop_s: float = 0.02):
+    """Splits a continuous F0 track into discrete "notes": stable-pitch regions
+    where the glide velocity stays below velocity_thresh (semitones/sec).
+
+    Returns a list of (pitch_semitone, duration_s) tuples, one per detected note.
+    """
+    notes = []
+    for start, end in _voiced_runs(f0_track):
+        if end - start < 3:
+            continue
+        seg_semitone = 12 * np.log2(f0_track[start:end] / ref_freq)
+        seg_t = times[start:end]
+        velocity = np.gradient(seg_semitone, seg_t)
+        stable = np.abs(velocity) < velocity_thresh
+
+        idx, n = 0, len(stable)
+        while idx < n:
+            if stable[idx]:
+                j = idx
+                while j < n and stable[j]:
+                    j += 1
+                note_duration = seg_t[j - 1] - seg_t[idx] + hop_s
+                if note_duration >= min_note_duration:
+                    notes.append((float(np.median(seg_semitone[idx:j])), float(note_duration)))
+                idx = j
+            else:
+                idx += 1
+    return notes
+
+
+def melodic_interval_features(sound: parselmouth.Sound, hop_s: float = 0.02,
+                               ref_freq: float = 440.0) -> dict:
+    """Discretizes the pitch contour into notes, then measures the melodic
+    interval structure between consecutive notes (a speech analogue of a
+    melodic-interval-content analysis in music)."""
+    pitch = sound.to_pitch(time_step=hop_s)
+    f0_track = pitch.selected_array["frequency"]
+    times = pitch.ts()
+    duration = sound.get_total_duration()
+
+    notes = segment_notes(f0_track, times, ref_freq=ref_freq, hop_s=hop_s)
+
+    if len(notes) < 2:
+        return {"mean_interval_size": np.nan, "interval_std": np.nan,
+                "num_notes_per_sec": np.nan, "direction_entropy": np.nan}
+
+    pitches = np.array([note[0] for note in notes])
+    intervals = np.diff(pitches)
+    directions = np.sign(intervals)
+
+    _, counts = np.unique(directions, return_counts=True)
+    probs = counts / counts.sum()
+    direction_entropy = float(-np.sum(probs * np.log2(probs)))
+
+    return {
+        "mean_interval_size": float(np.mean(np.abs(intervals))),
+        "interval_std": float(np.std(intervals)),
+        "num_notes_per_sec": float(len(notes) / duration) if duration > 0 else np.nan,
+        "direction_entropy": direction_entropy,
+    }
+
+
 def extract_all_features(path: str) -> dict:
     sound = parselmouth.Sound(path)
     if sound.get_number_of_channels() > 1:
@@ -320,6 +593,10 @@ def extract_all_features(path: str) -> dict:
     features.update(rhythm_features(sound))
     features.update(harmony_features(sound))
     features.update(scale_features(sound))
+    features.update(melody_contour_features(sound))
+    features.update(melodic_interval_features(sound))
+    features.update(rhythm_pattern_features(sound))
+    features.update(pitch_stress_contrast_features(sound))
     return features
 
 
@@ -373,7 +650,37 @@ if __name__ == "__main__":
         wt = _best_rotation_correlation(hist, _WHOLETONE_PROFILE)
         print(f"{name:<18}{maj:>10.3f}{mino:>10.3f}{wt:>14.3f}")
 
-    # Sanity check 3: coarse (12-bin, hard-rounded) vs fine (60-bin, smoothed
+    # Sanity check for melody features: synthesize a clean 4-note melody
+    # (A3 -> B3 -> C#4 -> A3, i.e. intervals +2, +2, -4 semitones) with short
+    # glides between held notes, and confirm segment_notes recovers ~4 notes
+    # with intervals matching what was actually played.
+    print()
+    print("=== Melody sanity check: synthetic A3-B3-C#4-A3 melody ===")
+    sr = 16000
+    note_freqs = [220.00, 246.94, 277.18, 220.00]  # A3, B3, C#4, A3
+    note_dur, glide_dur = 0.3, 0.03
+    segments = []
+    for i, f in enumerate(note_freqs):
+        segments.append(np.full(int(note_dur * sr), f))
+        if i < len(note_freqs) - 1:
+            segments.append(np.linspace(f, note_freqs[i + 1], int(glide_dur * sr)))
+    freq_track = np.concatenate(segments)
+    t = np.arange(len(freq_track)) / sr
+    phase = 2 * np.pi * np.cumsum(freq_track) / sr
+    y = np.sin(phase)
+    sf_path = "/private/tmp/claude-501/-Users-minjoolee-Downloads-MUStARD/c8ce0015-f13f-4958-aeaa-1445bff3da93/scratchpad/_melody_sanity_check.wav"
+    try:
+        import soundfile as sf
+        sf.write(sf_path, y, sr)
+        sound = parselmouth.Sound(sf_path)
+        contour = melody_contour_features(sound)
+        interval = melodic_interval_features(sound)
+        print("expected intervals: [+2, +2, -4] semitones, ~4 notes, ~3.1 notes/sec")
+        print({**contour, **interval})
+    except Exception as e:
+        print(f"skipped (needs soundfile + a writable /tmp): {e}")
+
+    # Sanity check: coarse (12-bin, hard-rounded) vs fine (60-bin, smoothed
     # templates) major_fit on the SAME melody, both perfectly in-tune and
     # detuned by a random +/-40 cents per note (speech never lands exactly on
     # a 12-TET semitone). The fine version should degrade less under detuning.
@@ -398,3 +705,94 @@ if __name__ == "__main__":
         coarse_fit = _best_rotation_correlation(coarse_hist, _MAJOR_PROFILE)
         fine_fit = _best_rotation_correlation_fine(fine_hist, fine_major_template)
         print(f"{label:<24}{coarse_fit:>20.3f}{fine_fit:>26.3f}")
+
+    # Sanity check for rhythm features: a perfectly regular beat (equal note/
+    # rest durations, equal loudness) should score low on nPVI/rPVI/ioi_cv/
+    # stress_contrast; an irregular, accented beat (alternating long/short
+    # notes, alternating loud/soft) should score high on all four.
+    print()
+    print("=== Rhythm sanity check: regular vs irregular+accented beat ===")
+
+    def make_beat_track(sr, durations, amps, gap, freqs=None, fade_s=0.01):
+        if freqs is None:
+            freqs = [220.0] * len(durations)
+        segs = []
+        for dur, amp, freq in zip(durations, amps, freqs):
+            n = int(dur * sr)
+            tone = amp * np.sin(2 * np.pi * freq * np.arange(n) / sr)
+            fade_n = min(int(fade_s * sr), n // 2)
+            if fade_n > 0:
+                ramp = np.linspace(0, 1, fade_n)
+                tone[:fade_n] *= ramp
+                tone[-fade_n:] *= ramp[::-1]
+            segs.append(tone)
+            segs.append(np.zeros(int(gap * sr)))
+        return np.concatenate(segs)
+
+    sr = 16000
+    regular = make_beat_track(sr, durations=[0.2] * 8, amps=[0.8] * 8, gap=0.2)
+    irregular = make_beat_track(sr, durations=[0.15, 0.35] * 4, amps=[0.9, 0.3] * 4, gap=0.2)
+
+    print(f"{'condition':<14}{'nPVI_voiced':>12}{'rPVI_pause':>12}{'stress_contrast':>17}{'ioi_cv':>10}")
+    for name, y in [("regular", regular), ("irregular", irregular)]:
+        path = f"/private/tmp/claude-501/-Users-minjoolee-Downloads-MUStARD/c8ce0015-f13f-4958-aeaa-1445bff3da93/scratchpad/_rhythm_sanity_{name}.wav"
+        try:
+            import soundfile as sf
+            sf.write(path, y, sr)
+            sound = parselmouth.Sound(path)
+            feats = rhythm_pattern_features(sound)
+            print(f"{name:<14}{feats['npvi_voiced']:>12.3f}{feats['rpvi_pause']:>12.4f}"
+                  f"{feats['stress_contrast']:>17.3f}{feats['ioi_cv']:>10.3f}")
+        except Exception as e:
+            print(f"{name}: skipped ({e})")
+
+    # Sanity check for pitch_stress_contrast: same constant loudness/duration
+    # throughout (so the loudness-based stress_contrast should stay ~0 in both
+    # cases), but one version alternates pitch (A3/E4, a 7-semitone leap) and
+    # the other stays flat. pitch_stress_contrast should track ONLY the pitch
+    # alternation, confirming it captures something stress_contrast can't.
+    print()
+    print("=== Pitch-accent sanity check: flat pitch vs alternating pitch, constant loudness ===")
+    flat = make_beat_track(sr, durations=[0.2] * 8, amps=[0.8] * 8, gap=0.2,
+                            freqs=[220.0] * 8)
+    alternating = make_beat_track(sr, durations=[0.2] * 8, amps=[0.8] * 8, gap=0.2,
+                                   freqs=[220.0, 329.63] * 4)  # A3, E4 (perfect 5th, 7 semitones)
+
+    print(f"{'condition':<14}{'stress_contrast':>17}{'pitch_stress_contrast':>24}")
+    for name, y in [("flat pitch", flat), ("alternating pitch", alternating)]:
+        path = f"/private/tmp/claude-501/-Users-minjoolee-Downloads-MUStARD/c8ce0015-f13f-4958-aeaa-1445bff3da93/scratchpad/_pitch_stress_{name.replace(' ', '_')}.wav"
+        try:
+            import soundfile as sf
+            sf.write(path, y, sr)
+            sound = parselmouth.Sound(path)
+            loud_feats = rhythm_pattern_features(sound)
+            pitch_feats = pitch_stress_contrast_features(sound)
+            print(f"{name:<14}{loud_feats['stress_contrast']:>17.3f}"
+                  f"{pitch_feats['pitch_stress_contrast']:>24.3f}")
+        except Exception as e:
+            print(f"{name}: skipped ({e})")
+
+    # Sanity check: ioi_npvi vs ioi_cv robustness to a single boundary outlier
+    # (e.g. utterance-final lengthening -- a common, sarcasm-unrelated effect).
+    # A local pairwise measure (npvi) should move much less than a global one
+    # (cv) when only the very last interval is stretched.
+    print()
+    print("=== ioi_cv vs ioi_npvi: robustness to one outlier IOI ===")
+    regular_iois = np.array([0.4] * 7)
+    with_outlier = np.array([0.4] * 6 + [1.2])  # last IOI stretched (final lengthening)
+
+    for label, iois in [("no outlier", regular_iois), ("with 1 outlier", with_outlier)]:
+        cv = float(np.std(iois) / np.mean(iois))
+        npvi = _npvi(iois)
+        print(f"{label:<18} ioi_cv={cv:.3f}  ioi_npvi={npvi:.3f}")
+
+    # Sanity check: rpvi_pause_filtered should ignore short consonant-closure
+    # gaps and reflect only the variability among genuine (>=100ms) pauses.
+    print()
+    print("=== rpvi_pause vs rpvi_pause_filtered: consonant closures mixed with real pauses ===")
+    consonant_gaps = [0.03, 0.04, 0.035, 0.045, 0.03]
+    real_pauses = [0.30, 0.45, 0.32]
+    mixed = consonant_gaps + real_pauses
+    filtered = [d for d in mixed if d >= 0.10]
+    print(f"raw rpvi_pause (mixed)      = {_rpvi(mixed):.4f}")
+    print(f"filtered rpvi_pause (>=100ms) = {_rpvi(filtered):.4f}  (expected: reflects only {real_pauses})")
