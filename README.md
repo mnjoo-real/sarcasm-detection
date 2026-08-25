@@ -186,6 +186,68 @@ Tried correlating VAD (the standard 3-dimensional emotion model) against every a
 addition is the smallest single increment (+0.004) — most of its signal overlaps with features already in the
 model (arousal with `energy_std`/`speaking_rate_proxy`, dominance with `f0_mean`, valence with `hnr_mean`/`dissonance_mean`), consistent with it being a real but largely redundant confirmation rather than new information.
 
+### Phase 6 — Does any of this survive leaving MUStARD entirely? (PodSarc)
+
+The real test: **PodSarc** (podcast sarcasm, ~11k utterances from *Overly Sarcastic Productions*, GPT-4o +
+Llama3 sarcasm labels with human arbitration on disagreements — 2,885 human-verified utterances used here).
+Completely different domain: natural conversational co-hosts, not scripted TV performance; clips average
+9.1s vs. MUStARD's 4.3s.
+
+**Direct transfer ([`validate_on_podsarc.py`](validate_on_podsarc.py))**: train the v1 model on all of MUStARD,
+predict on PodSarc (its own corpus-level z-score in place of show-normalization). **F1 = 0.505 — chance.**
+(MUStARD-internal reference: 0.648 random CV, 0.607 LOSO.)
+
+**Why, feature by feature ([`analyze_podsarc_replication.py`](analyze_podsarc_replication.py))**: tested all 33
+features (not just MUStARD's chosen 20) for direction-replication, pooled and episode-controlled (PodSarc's
+analogue of show-control; its 30 episodes share mostly the same 2-3 hosts, so this tests topic- not
+speaker-generalization). Mixed and revealing:
+
+| Result | Features |
+|---|---|
+| **Direction flips** | `dissonance_mean` (MUStARD's single strongest signal), `hnr_mean`, `f0_mean`, `melodic_path_length`, `direction_change_rate` |
+| **Direction replicates** | `voiced_ratio`, `speaking_rate_proxy`, `energy_std`, `inharmonicity_mean`, `stress_contrast`, `ioi_cv`, `rpvi_pause`/`rpvi_pause_filtered` |
+| **MUStARD-rejected features recovered here** | `wholetone_fit`, `tonal_clarity`, `ioi_npvi`, `pitch_stress_contrast` (all survive episode-control; scale-fit features that failed completely in MUStARD) |
+| **MUStARD-rejected, rejected again** | `major_fit`, `minor_fit`, `majorness`, `mean_interval_size`, `interval_std`, `direction_entropy`, `npvi_voiced` |
+
+Dissonance flipping is why direct transfer collapsed: the model's most heavily-weighted feature actively points
+the wrong way in this domain. Rhythm features were the most portable; melody was the least (see below). Real
+audio-VAD (wav2vec2) also stopped replicating: none of arousal/dominance/valence survive episode-control here
+([`analyze_podsarc_vad_gap.py`](analyze_podsarc_vad_gap.py)), vs. p<0.0001 on all three in MUStARD.
+
+**Melody specifically didn't transfer**: none of MUStARD's 4 kept melody features hold up cleanly —
+`final_initial_diff` (the "sarcastic rise" story) goes from MUStARD's headline finding to p=0.93 in PodSarc;
+`direction_change_rate` is significant but its *sign flips*; `num_notes_per_sec` and `melodic_path_length` don't
+survive episode-control. The exaggerated, theatrically-performed pitch contour that TV sitcom delivery uses for
+comedic emphasis doesn't seem to be a thing natural podcast conversation does.
+
+**Retraining from scratch on PodSarc** ([`train_podsarc_classifier.py`](train_podsarc_classifier.py), GroupKFold
+by episode): MUStARD's 20 features get F1=0.538 (episode-normalized) when refit on PodSarc's own distribution —
+real signal, well above the ~0.38 majority-baseline, but far short of MUStARD-internal performance. A feature
+set built *from PodSarc's own replication test* (15 features, including the 4 recovered scale/pitch ones) does
+slightly better: **F1=0.545** — the best result on PodSarc, and once again "all 33 features" (0.535) loses to
+a validated subset, the same more-features-hurts pattern as every earlier phase.
+
+**Cross-modal VAD gap replicates**: the same "smaller gap for sarcasm" direction and the same variance-compression
+confound as MUStARD (`gap_total` p=0.0001 after episode-control; sarcastic-utterance variance is lower in both
+audio- and text-VAD here too). Seeing the identical pattern in two structurally unrelated corpora makes this
+more likely a genuine cross-domain regularity (crafted punchlines are more uniformly delivered) than a
+corpus-specific artifact — but it still doesn't resolve into a validated "mismatch predicts sarcasm" mechanism.
+
+**Sarcasm quadrant analysis needed a 3rd axis here**: PodSarc has no MUStARD-style context field, so the 345-item
+manual judging method (direct/ironic × friendly/hostile) was repeated on PodSarc's 287 sarcastic utterances from
+text alone. Result: 77% landed in Q1 ("direct", non-hostile) — a degenerate distribution (Q3 "bite" = 1 item,
+literally too small to test) that turned out to be a modeling gap, not a property of the data: much of that Q1
+mass was **direct but hyperbolic** exaggeration ("Operation Fish Hemsworth is a go", stacked superlatives, mock-
+epic language) — sarcasm via overstatement rather than via literal-meaning-flip, which the 2-axis scheme had no
+slot for. Adding a third axis, **proportionate ↔ hyperbolic** ([`podsarc_quadrant_labels.py`](podsarc_quadrant_labels.py),
+[`analyze_podsarc_octants.py`](analyze_podsarc_octants.py)), split it cleanly: 180 direct+friendly+proportionate
+vs. 39 direct+friendly+**hyperbolic** — confirming the missing category was real. But none of 16 acoustic
+features tested distinguish hyperbolic from proportionate delivery (all p>0.1, episode-controlled). Plausible
+reading: irony functionally *needs* a vocal cue to signal "don't take this literally" (which is exactly what
+dissonance/pitch/rhythm were picking up on), while hyperbole is usually already legible from word choice alone
+("a million times") and doesn't need one — a genuine negative result that sharpens *why* irony is acoustically
+marked and hyperbole isn't, rather than a failure to find something that should have been there.
+
 ### Lessons that generalized across the whole exploration
 
 1. **Random CV lies here.** Every "improvement" was re-checked show-independent before being believed; several
@@ -208,6 +270,15 @@ model (arousal with `energy_std`/`speaking_rate_proxy`, dominance with `f0_mean`
    questions, confirmed again with a properly validated external model, not just our own hand-built features.
 8. When two independent measurements move together (the audio/text VAD gap shrinking for sarcasm), check
    variance before concluding they *agree* — shrinking dispersion in both measurements can mimic convergence.
+9. **A model that works within one corpus can fail completely on another (F1 0.607 → 0.505) even when both are
+   "the same task."** Show-independence inside MUStARD and domain-independence across MUStARD/PodSarc are
+   different, unrelated tests — passing the first proves nothing about the second.
+10. **Feature significance is domain-specific, not just show-specific.** MUStARD's strongest single feature
+    (dissonance) flipped sign in PodSarc, while several features MUStARD rejected outright turned out to matter
+    there. A feature set earns its place per-domain; it doesn't transfer by authority.
+11. **Not every sarcasm marker needs a matching acoustic marker.** Irony (literal-meaning flip) is acoustically
+    loud because the mismatch has to be signaled somehow; hyperbole (scale exaggeration) can be entirely lexical
+    and still read as sarcastic. A clean null result on the hyperbole axis is informative, not a dead end.
 
 ### Files
 
@@ -228,3 +299,16 @@ model (arousal with `energy_std`/`speaking_rate_proxy`, dominance with `f0_mean`
 | `data/harmonic_features.csv` | Harmony/melody/rhythm feature table (690 rows) with labels |
 | `data/audio_vad.csv` | wav2vec2 audio V/A/D per utterance |
 | `data/vad-nrc-lexicon.csv` | NRC-VAD Lexicon (Mohammad 2018), used by `compute_text_vad.py` |
+| `extract_podsarc_features.py` | Checkpointed batch CLI: harmony/melody/rhythm for PodSarc (resumable — writes every N utterances) |
+| `extract_podsarc_audio_vad.py` | Checkpointed wav2vec2 audio V/A/D for PodSarc — run in `.venv_vad` |
+| `compute_podsarc_text_vad.py` | Text-side V/A/D for PodSarc via the NRC-VAD Lexicon |
+| `validate_on_podsarc.py` | Direct transfer test: MUStARD-trained v1 model evaluated on PodSarc |
+| `analyze_podsarc_replication.py` | Does each MUStARD feature's direction/significance replicate in PodSarc? (all 33, pooled + episode-ANCOVA) |
+| `train_podsarc_classifier.py` | Retrains from scratch on PodSarc, GroupKFold by episode; compares MUStARD's 20 vs. a PodSarc-validated 15 vs. all 33 |
+| `analyze_podsarc_vad_gap.py` | PodSarc replication of the sarcasm-vs-VAD test and the cross-modal gap analysis |
+| `podsarc_quadrant_labels.py` | Manual 3-axis (direct/ironic × friendly/hostile × proportionate/hyperbolic) judgments for PodSarc's 287 sarcastic utterances |
+| `analyze_podsarc_octants.py` | 8-octant breakdown + proportionate-vs-hyperbolic acoustic test |
+| `data/podsarc_labels.csv` | Full PodSarc human-verified label set (2,885 rows: nid, episode, text, sarcasm) |
+| `data/podsarc_labels_sample.csv` | 700-item stratified subsample used for the (slower) wav2vec2 VAD pass |
+| `data/podsarc_harmonic_features.csv` | Harmony/melody/rhythm features for all 2,885 PodSarc utterances |
+| `data/podsarc_audio_vad.csv` | wav2vec2 audio V/A/D for the 700-item PodSarc sample |
