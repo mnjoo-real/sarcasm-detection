@@ -1,0 +1,361 @@
+id,utterance,context_last,utt_sentiment,context_sentiment,irony_gap,show
+1_60,It's just a privilege to watch your mind at work.,My apologies. What's your plan?,0.3612,0.0,0.3612,BBT
+1_70,I don't think I'll be able to stop thinking about it.,You'll think about it?,-0.296,0.9231,-1.2191,BBT
+1_105,I'm just inferring this is a couch because the evidence suggests the coffee table is having a tiny garage sale.,Explain to me an organizational system where a tray of flatware on a couch is valid.,0.0,-0.7368,0.7368,BBT
+1_175,"If you're compiling a mix CD for a double suicide. Oh, I hope that scratching post is for you.","God, that's a good song.",-0.3818,0.7845,-1.1663,BBT
+1_182,No. The dark crescent-shaped patterns under your arms conceal it nicely.,Can you tell I'm perspiring a little?,0.4404,0.0,0.4404,BBT
+1_213,"How's this? ""Pleased to meet you, Dr. Gablehauser. ""How fortunate for you that the university's ""chosen to hire you, despite the fact ""that you've done no original research in 25 years, ""and instead have written a series of popular books ""that reduce the great concepts of science ""to a series of anecdotes, ""each one dumbed down to accommodate the duration ""of an average bowel movement.","Then we'll avoid him, we'll meet the new department head, congratulate him, shake his hand and go.",0.8533,0.9252,-0.07190000000000007,BBT
+1_276,"Yeah, my parents felt that naming me Leonard and putting me in Advanced Placement classes wasn't getting me beaten up enough.","Yeah, you, too.
+Leonard, I didn't know you played the cello.",0.6738,0.4956,0.17819999999999997,BBT
+1_340,"Sure, cut the foreigner in half. There's a billion more where he came from.",The only way we can play teams at this point is if we cut Raj in half.,0.0516,0.1477,-0.09609999999999999,BBT
+1_427,"Well, I'm sorry, too, but there's just no room for you in my wallet.","Yeah, I need to cancel my membership to the planetarium.",-0.34,0.0516,-0.3916,BBT
+1_507,"Well, there's always the possibility that a trash can spontaneously formed around the letter but Occam's rasor would suggest that someone threw it out.","Sheldon, why is this letter in the trash?",0.1406,0.1901,-0.04949999999999999,BBT
+1_536,Just the latest copy of Applied Particle Physics quarterly.,Get anything good?,0.0,0.4404,-0.4404,BBT
+1_537,"Oh, you know, that is so weird that yours came and mine didn't.",Just the latest copy of Applied Particle Physics quarterly.,-0.3052,0.4404,-0.7456,BBT
+1_971,"- Now?! - No, after my tongue has swollen to the size of a brisket!",Don't yell at me! I've got to go to the emergency room!,0.0,-0.6713,0.6713,BBT
+1_1003,"Good idea, sit with her. Hold her, comfort her. And if the moment feels right, see if you can cop a feel.",I'm gonna go back and try talking to her again.,0.6597,-0.4871,1.1467999999999998,BBT
+1_1144,"Notify the editors of the Oxford English Dictionary. The word ""plenty"" has been redefined to mean ""two.""","There was Joyce Kim, Leslie Winkle",0.0,0.8377,-0.8377,BBT
+1_1180,"Oh, please. The only way she could make a contribution to science would be if they resumed sending chimps into space.","They have a lot in common. I mean, they're both scientists.",0.3182,-0.3757,0.6939,BBT
+1_1296,"They gave him an assistant? If I want a new pen, I have to go to the bank with wire cutters.",Go for Koothrappali.,0.0772,0.6808,-0.6035999999999999,BBT
+1_1466,"Maybe when I publish it, I'll include an inhaler.","I just finished reading your paper reconciling the black hole information paradox with your theory of string-network condensates, and it just took my breath away.",0.0,-0.0258,0.0258,BBT
+1_1478,"Sadly, Mrs. Giselle Wolowitz is sensitive to chlorine. Lucky for her I like my fashion models pruny and bug-eyed.","Not yet, but her underwater photo shoot was an embarrassment.",0.3612,-0.8229,1.1841,BBT
+1_1549,On a dusty highway just outside Bakersfield. Where do you think? On Mars!,Where?,0.0,0.6946,-0.6946,BBT
+1_1560,How nice. Maybe they can carpool when they visit you in federal prison.,My mother is so gonna love her.,-0.128,0.9419,-1.0699,BBT
+1_1638,The blunt instrument that will be the focus of my murder trial?,Tell me what you see here.,-0.6908,0.0,-0.6908,BBT
+1_1732,You were right. Your larynx is terribly inflamed. I've never seen anything like it.,What?,-0.797,-0.296,-0.5010000000000001,BBT
+1_1772,"""Dave."" Sounds like Leonard's got a new BFF.",Where were you?,0.7983,0.4486,0.3497,BBT
+1_1798,"If you don't like this stuff, let's go next door and build her a bear.",It's as if my head were trapped in the pajamas of a sultan.,-0.2755,-0.7906,0.5150999999999999,BBT
+1_1803,"- Maybe I heard you wrong. A lot of words sound like ""yoga.""","I know, I've been offering to show you around for a year and a half. You always said you had yoga.",-0.1531,0.6588,-0.8119000000000001,BBT
+1_1931,Why don't you just lie down on the floor and swim there?,I'm going to acquire a book that summarizes the current theories in the field of friend-making.,0.0,0.0,0.0,BBT
+1_1973,I hope I'm a waitress at the Cheesecake Factory for my whole life.,"Additionally, I like having my belly scratched.",0.4404,0.6662,-0.2258,BBT
+1_1987,"When I didn't pay my bill, the Department of Water and Power thought I would enjoy the ambience.","A little mood lighting, huh?",0.5417,0.0,0.5417,BBT
+1_2119,"Kind of makes you feel more alive, doesn't it?",The big wet ball of death.,0.4391,-0.965,1.4041,BBT
+1_2198,"Assuming I can keep up this pace, three hours, 11 minutes. Plus however long it takes to conclude this fairly pointless conversation.",How long is this going to take?,0.0,0.0,0.0,BBT
+1_2354,"So? Do cocaine smugglers write ""cocaine"" on the box?","The box says ""kitchen.""",-0.4137,0.6322,-1.0459,BBT
+1_2464,"You think ""coffee,"" means coffee. That is so sweet.","Gee, it's a little late for coffee, isn't it?",0.5949,0.8205,-0.22560000000000002,BBT
+1_2580,"Okay, here's an idea. What if I change my name and go live with my cousin and her husband, Avi, in Israel?",It won't work. No way to mount it.,0.2263,0.7609,-0.5346,BBT
+1_2614,Hardly a day goes by when I don't think about it.,Do you remember the grant proposal I submitted to the National Science Foundation to detect slow-moving monopoles at the magnetic North Pole?,0.0,0.4871,-0.4871,BBT
+1_2616,"Sure, maybe a tableau of me trying to pummel you to death.",Third-graders will create macaroni-art dioramas depicting scenes from my life.,-0.3818,0.2617,-0.6435,BBT
+1_2778,"Ooh, big talk from a man who was once treed by a chicken.","And I believe I could easily best you in any physical confrontation-- be it noogies, swirlies or the classic ""Why are you hitting yourself?""",0.0,0.5362,-0.5362,BBT
+1_2797,It's an iCal download. She can put it right in her phone.,"Sorry, I haven't given her your schedule yet.",0.0,0.6072,-0.6072,BBT
+1_2819,"You know, I've always wanted to go to a Goth nightclub.","Put them on, have hot sex with some freaky girl with her business pierced, take them off, and I can still be buried in a Jewish cemetery.",0.0,0.3527,-0.3527,BBT
+1_2853,"Obviously, waitressing at The Cheese Cake Factory is a complex socio-economic activity that requires a great deal of analysis and planning.",What could she possibly be talking about for so long?,0.6249,0.3382,0.2867,BBT
+1_3064,When I have enough to destroy all the human toast on the Battlestar known as Galactica.,When are you going to stop making Cylon toast?,-0.5423,-0.296,-0.24630000000000002,BBT
+1_3125,"But if she dumps you, she'll have a new boyfriend by tomorrow morning and you'll have a new girlfriend when you figure out how to build one.",Thank you!,-0.5499,0.5707,-1.1206,BBT
+1_3256,"I'm sorry, fiddling with yourself in the bathtub is a real class act.","Come on, Katee. Don't make it sound so cheap.",-0.0772,0.9299,-1.0070999999999999,BBT
+1_3259,"No, I mean Princess Leia. Of course I mean Bernadette. She's a wonderful girl and she really likes you.","You mean, Bernadette?",0.7778,0.8611,-0.08329999999999993,BBT
+1_3287,"Oh, sure. And while we're at it, why don't we put our hands behind our backs, have an old-fashioned eating contest?","Oh, come on, it's fine. We'll just put it all on the table, you know, family style.",0.2732,0.8453,-0.5721,BBT
+1_3293,Leonard's work is nearly as amazing as third graders growing lima beans in wet paper towels.,Yes.,0.6705,0.9413,-0.27080000000000004,BBT
+1_3419,"Oh, we don't need to talk about that anymore. Leonard covered it pretty well in the car.","Well, we could always learn more about why people who believe in psychics are idiots. Leonard?",0.6486,0.3527,0.29589999999999994,BBT
+1_3545,"I understand your point, but given a choice, Jews always go with Chinese food.","Given that Saint Valentine was a third century Roman priest who was stoned and beheaded, wouldn't a more appropriate celebration of the evening be taking one's steady gal to witness a brutal murder?",0.0,-0.8126,0.8126,BBT
+1_3573,"Well, I always figured it was to study us, discover our weaknesses, and report back to your alien overlords.",I believe you know why I'm here.,-0.1027,0.25,-0.3527,BBT
+1_3660,There a new girlfriend in there? 'Cause you might need one.,We didn't even get to go through it all. There could be anything in here.,0.0,0.5399,-0.5399,BBT
+1_3707,"Oh, I'm so glad you asked it like that. You.","All right, I'll play. What self-important, preening fraud are they honoring this year?",0.7481,0.8677,-0.11960000000000004,BBT
+1_3766,Can we please talk about something else? Maybe something vaguely related to life as we know it on this planet?,"For the record, giant rats are possible.",0.3939,-0.2887,0.6826,BBT
+1_4031,"In 1917, when Albert Einstein established the theoretic foundation for the laser in his paper <i>""Zur Quantentheorie der</i> <i>Strahlung,""</i> his fondest hope was that the resultant device be bitchin'.",Yes.,0.4404,0.8706,-0.4302,BBT
+1_4145,A lot of people are working on that research. So what is all this?,What I'm doing here is trying to determine when I'm going to die.,0.0,-0.7717,0.7717,BBT
+1_4743,"Oh, and the science dudes want to talk science with you. What do you want to talk about-- rocks, dinosaurs, our friend the beaver?","Ah, not yet. I want to talk science with the science dudes.",0.5859,0.8145,-0.22860000000000003,BBT
+1_4760,"In the bedrooms of ten-year- old girls, where they belong.",Where do they keep the Archies?,0.0,0.836,-0.836,BBT
+1_4789,"I don't know. Somebody bigger and... Yeah, sure. Why not you?",Who else would it be?,0.5423,-0.3527,0.895,BBT
+1_4967,We might be starting to zero in on your problem.,"Thank you, but ""cute"" is for bunnies. I want to be something with sex appeal, like... like a labradoodle.
+Labradoodle?",-0.4019,0.9725,-1.3744,BBT
+1_4995,"Hey, you taught me something. Who would have thought it?","Okay, it's not a movie. It's improv. So no one calls ""action.""",0.0,-0.2444,0.2444,BBT
+1_5058,"An entire dinner to talk about your research? Where you going, the drive-thru at Jack in the Box?",She wants to have dinner and talk about my research.,0.0,0.875,-0.875,BBT
+1_5134,"Oh, yeah, yeah. It's real great. Today I drove to Van Nuys for an audition I thought was going to be for a cat food commercial. Turned out to be porn.","So, Penny, Leonard tells me you're an actress. That must be pretty exciting.",0.8176,0.9034,-0.08579999999999999,BBT
+1_5156,"That's got to be fun for you, huh? Watching Hofstadter suck the saliva out of your sister's mouth?","Hey, you.",0.1926,0.3313,-0.1387,BBT
+1_5166,"Yeah, it's a great time to be alive, isn't it?","Fine. From this angle, I can see up your nose.",0.836,0.9161,-0.08010000000000006,BBT
+1_5211,"Saying that while holding a snowflake is a bit heavy-handed, don't you think?",Leonard's really one of a kind.,0.0,0.8878,-0.8878,BBT
+1_5496,"Okay, Amy, you're being silly. I'm not concerned about who hangs out with who. And I certainly don't have a problem with Leonard's new girlfriend who wears way too much makeup. Ooh, these are cute. Of course if I buy them, I'll have to rent my womb out to a gay couple.",Your trusting nature coupled with your teeny-tiny body. You wouldn't last a minute on the Serengeti.,0.8252,-0.8818,1.707,BBT
+1_5571,"Yes, I'd like a seven-day course of penicillin, some, uh, syrup of ipecac-- to induce vomiting-- and a mint.",You guys ready to order?,0.6369,0.6749,-0.038000000000000034,BBT
+1_5572,"He drank from Leonard's glass. ""He drank from Leonard's glass""-- the words they'll be carving into my tombstone.",I don't understand.,0.0,0.8845,-0.8845,BBT
+1_5580,"Right, right, whereas Jewish mothers take a casual, la-di-da approach to their sons.","Uh... that's different.
+First of all, we're not engaged; and second, Indian parents are very protective of their children.",0.2023,-0.3089,0.5112,BBT
+1_5617,is an event that's like a heart attack.,A heart-attack-like event,0.5574,0.8418,-0.2844,BBT
+1_5627,"Your girlfriend and your ex-girlfriend are hanging out together? Oh, yeah, that can only be good for you.",That's nice that they're getting along.,0.6249,0.5262,0.09870000000000001,BBT
+1_5679,"I'd like to respond to that sarcastically: Yes, I relish the thought of a stranger covering my body with oil and rubbing it.",Have you considered massage?,0.4767,0.6553,-0.17859999999999998,BBT
+1_5699,"Congratulations and welcome temporarily aboard. Here's your I.D. card, your key and your lapel pin. Which Leonard was too cool to wear.","Well, that seems fair.",0.8519,0.8957,-0.04380000000000006,BBT
+1_5758,"Oh, I could so see you being the face of hemorrhoids.","The closest I came was last month, I got a callback for a hemorrhoid commercial.",0.0,0.3612,-0.3612,BBT
+1_5880,"When you're done copping a feel, that goes on my wrist.","When you're done copping a feel, that goes on my wrist.",0.0,0.2732,-0.2732,BBT
+1_5964,Smart. Whisper so the deaf chick can't hear you.,I can't believe you're engaged to my friend.,0.4019,0.892,-0.49010000000000004,BBT
+1_6020,You just got off the list. Would you like back on it? This'll just take a moment. It's on a five and a quarter inch floppy.,"Oh, say no, say no, say no, say no.",0.3612,-0.7278,1.089,BBT
+1_6032,"You see betrayal in others, but not yourself.","I hate to say it, but she did kind of betray you.",-0.34,-0.7436,0.4036,BBT
+1_6065,"Frankly, Mom, I'm encouraged to see how advanced your group has become-- willing to sail out into the ocean without fear of falling off the edge.","You write your sins on a clay pigeon, they fire 'em up in the air, and you pulverize them with a 12-gauge shotgun full of our Lord's forgiveness.",0.763,0.4404,0.3226,BBT
+1_6134,"No, I'm just allergic to people who get Nobel Prizes for no good reason.",Are you getting sick?,-0.1546,-0.7269,0.5723,BBT
+1_6165,"Yes, there's nothing quite like the slightly widened eyes of mildly startled.",You should've seen your face.,-0.0841,0.8126,-0.8966999999999999,BBT
+1_6188,"Oh, my God, that's where I know you from.","Okay, we used to go out, right?",0.2732,0.8253,-0.5521,BBT
+1_6221,"Well, if you don't mind looking like an orange traffic cone, great.","So, Bernadette, how goes the hunt for bridesmaid dresses?",0.6237,0.0,0.6237,BBT
+1_6355,"said horrible things about each other in public... all in all, a pretty magical night.","Okay. So... we went out, saw a movie, met some nice people,",-0.0772,0.5719,-0.6491,BBT
+1_6370,"Oh, of course he is. She's very interesting. Did you know, when she was 14, she severed the webbing between her own toes?",Stuart's kind of interested in Amy.,0.1263,0.8687,-0.7424000000000001,BBT
+1_6426,"You know, the holidays are just around the corner. Maybe he wants to see if he can lodge the other testicle up there.",I don't know.,0.3818,0.4922,-0.11040000000000005,BBT
+1_6427,Hmm. That's too bad. We could have spent New Year's Eve waiting for the ball to drop.,I told you. That was a different guy.,-0.6808,0.7514,-1.4322,BBT
+1_6428,Sure. You want to see what all the scientists are wearing this year.,Nobel Prize acceptance ceremony streaming live from Stockholm.,0.3818,0.743,-0.3612,BBT
+1_6472,You'd think a winner could make a decent cup of cocoa.,You're the winner.,0.5859,0.8107,-0.2248,BBT
+1_6504,"Oh, I see why you're confused. No, her news sounded important, but what you're forgetting is, it was an achievement in the field of biology. That's all about yucky, squishy things.","Okay, Amy just told you some exciting news, and you acted like it was no big deal.",-0.6059,0.6705,-1.2764,BBT
+1_6648,You mean for a person whose neck massages feel like an eagle is trying to carry you to its nest?,"Okay, you're kind of really great.",0.3612,0.9402,-0.579,BBT
+1_6683,"Yeah, terrific. The other astronauts would love to go hurtling through space with a guy named ""Crash.""","Okay, um... how about ""Crash""? 
+Howard ""Crash"" Wolowitz.",0.6597,-0.6515,1.3112,BBT
+1_6769,"Hope your hands are steady. It's the width of a single hair. But this is just biology, so I'm sure it's no problem for a genius like you.","You're getting warmer-- it is, indeed, in the brain.",0.8874,-0.046,0.9334,BBT
+1_7047,"Also instead of just living in your mother's house, you could actually live inside her body.",The first of my people to dunk a basketball.,0.0,-0.4606,0.4606,BBT
+1_7089,"How about you? Did you have a fun night? Yeah, we, uh, made gift bags, had wine, and then went online and saw this.",That's nice.,0.8299,0.9627,-0.13280000000000003,BBT
+1_7281,"Darn. If you weren't busy, I'd ask you to join us.","W-Which is cool.
+I eat alone, I sleep alone, I cry alone, so...
+Cool.",0.296,-0.5983,0.8943000000000001,BBT
+1_7357,I'm starting to get a sense of it.,"Oh, you have no idea how annoying this is.",0.0,-0.5994,0.5994,BBT
+1_7395,"Well, if that's all it takes, it's a good thing you don't have a dog.",He looked at me like this.,0.6124,-0.128,0.7404000000000001,BBT
+1_7402,I didn't know they gave Nobel prizes for making boom-boom in the potty.,perhaps I've already hit upon the idea that will win me my Nobel prize.,0.4588,0.9818,-0.523,BBT
+1_7575,"You're right, the party's fantastic. Please, tell me more. I haven't heard enough about it all week because hearing about that never gets old!",Stuart wanted Kraft Draculoni and cheese.,0.7345,0.8602,-0.12569999999999992,BBT
+1_7722,Exactly what it was half an hour ago. It's like you're not even trying to get better.,"(thermometer beeps) 102.2.
+(coughs)",0.6597,0.0,0.6597,BBT
+1_7953,Why don't you ask Scotty to beam you up?,"Can I use your phone? 
+Our car got stolen.",0.0,-0.3094,0.3094,BBT
+1_8045,"Dumped her? What, did he use a forklift?",My mom's been kind of an emotional wreck since that dentist she was dating dumped her.,-0.4696,0.0,-0.4696,BBT
+1_8052,Like Burt and Ernie. You guys even teach me stuff about words and numbers.,"Yeah, but you two make such a cute couple.",0.3612,0.5998,-0.23859999999999998,BBT
+1_8136,"Yeah, I'm really looking forward to it. In fact, there's no place I would rather be than here.",It's nice that all the people who are lonely on Valentine's Day can come here tonight and be together.,0.0,0.0772,-0.0772,BBT
+1_8407,"Oh, sure, what a wonderful idea. And after that, I'll make up my own rules of oral hygiene. You know, instead of flossing, I'll rub pudding on my gums. I'm going to get the number of the SyFy Channel and give them what for.","Well, why don't you make up your own ending?",0.743,-0.6662,1.4092,BBT
+1_8452,I think I'm gonna go. Thank you for the burrito and the pork rinds and the 20-minute lecture on why monster trucks are better than regular trucks.,I don't know. Maybe it's all those steroids I've been taking.,0.6597,0.264,0.39569999999999994,BBT
+1_8717,Because you're in the right lane behind a bus and you won't go around it? I'm sure she finds it charming.,Do you think Penny's mad at me?,0.7269,-0.4939,1.2208,BBT
+1_8746,"I enjoyed it. When you told me I was going to be ""losing my virginity,"" I didn't think you meant showing me <i>Raiders of the Lost Ark</i> for the first time.","""Good""?",-0.1531,0.7461,-0.8992,BBT
+1_8749,It was very entertaining... despite the glaring story problem.,"Anyway, thank you for watching it.
+It's one of my all-time favorites.",0.1263,0.5719,-0.4456,BBT
+1_8827,How do you not tear off his clothes and take him right here on this table?,"Oh, no, I got bored with that.
+I'm just browsing cuticle scissors on Amazon.",0.0,-0.4939,0.4939,BBT
+1_9087,"Why? Because I got an ugly, itchy sweater, and my brother got a car? No, I was her favorite.","Aw, did she hate you?",-0.4137,-0.6369,0.2232,BBT
+1_9971,I was gonna say we pick up a cake or a pie. But an insult to her faith is always thoughtful.,"Despite what her Bible says, recent archeological studies indicate that although camels are referenced in the Old Testament, they didn't exist in the Middle East until hundreds of years later.",0.3919,0.4404,-0.04849999999999999,BBT
+1_9972,"Ooh, I'm gonna check the fridge, and see if there are any clues inside a beer.","I can't tell you that.
+But perhaps the killer dropped a fun and imaginative clue somewhere in the apartment.",0.0,-0.3612,0.3612,BBT
+1_9993,"Well, my beer isn't flat and my rack's not saggy. So far, the future's great.","Hey, you guys just time-traveled.
+Stop looking so bored.",0.7351,-0.024,0.7591,BBT
+1_10462,"You know, if you're really serious about that, I hear there are some exciting opportunities in home care for the old and fat.","It's an outrage.
+Honestly, I'm tempted to leave the university.",0.813,-0.7044,1.5173999999999999,BBT
+1_10495,"And if it turns out you don't... - you and I could live together. - You and... Oh, sure.",I don't know. Perhaps.,0.3182,-0.7887,1.1069,BBT
+1_10496,"- You and... Oh, sure. And while we're at it, why don't we get engaged, too? Why don't we get a little house, start a family? Enjoy our sunset years together? Do you hear yourself, woman?!",And if it turns out you don't...,0.6698,-0.795,1.4647999999999999,BBT
+1_10748,"There they go, fighting again. You'd never hear her talk that way to Sauvignon Blanc.",Relax.,-0.3612,0.34,-0.7012,BBT
+1_10829,"On the bright side, that Oxford study was right. One friend down. I wonder who you're going to lose next.",Great.,0.5267,0.7276,-0.20090000000000008,BBT
+1_10890,"Boy, when you met Bernadette, the field of robotics really took a hit.","There's just some things you don't do with your robot girlfriend.
+Boy, when you met Bernadette,",0.0,-0.3182,0.3182,BBT
+1_11006,Maybe it's a good thing we came here. It's like a lesson in what not to do.,I'll be right back. I'm gonna go check on him.,0.6597,0.9034,-0.24370000000000003,BBT
+1_11021,"Same as all of us, getting out of a car without underwear.",What would a one-celled organism have to be embarrassed about?,0.0,-0.6662,0.6662,BBT
+1_11055,"Ah, that's a good question. Apparently someone was being awfully flirty while not wearing their engagement ring, causing another someone to show up here thinking the first someone might be available.",Really? Why?,0.3211,0.8466,-0.5255000000000001,BBT
+1_11098,"Wow, you still have it? I just assumed it was balled up in the corner of a barn somewhere.","That, believe it or not, is my prom dress.",0.5859,0.6747,-0.08879999999999999,BBT
+1_11177,I'm listening to you snore. I'm wondering how I'll ever sleep without it.,"Okay, why?",0.0,0.2263,-0.2263,BBT
+1_11224,And here I am in the trap. You just keep talking. I'm gonna chew my leg off.,So there<i> are</i> things you don't like.,-0.3182,-0.5867,0.2685,BBT
+1_11232,"And I love that I work and do all the cleaning, and you're okay with that.",Uh-huh.,0.7269,0.9571,-0.23019999999999996,BBT
+1_11242,"I love that you take pride in your looks, even when I have to pee in the morning, and you're in there spending an hour on your hair.","Amy, you're a neuroscientist.
+Crack his skull open, spray some Raid in there.",0.765,0.7196,0.045399999999999996,BBT
+1_11243,I love that you're too good to pee in the kitchen sink.,"I love that you take pride in your looks, even when I have to pee in the morning, and you're in there spending an hour on your hair.",0.7964,0.8316,-0.03520000000000001,BBT
+1_11322,"You know what? That was almost on topic. I'm gonna say, ""Good job, Sheldon.""","You know, speaking of attorneys, if I ever needed a lawyer, I would not hire She-Hulk.",0.4404,-0.5096,0.9500000000000001,BBT
+1_11378,Are you sure a dummy like me can handle something as complicated as a blanket?,"Raj, you hold open the curtain so he can fly out.",0.5859,-0.4404,1.0263,BBT
+1_11439,"No, you're right, we should do what you do. Have our mom send us pants from the Walmart in Houston.","You know, I don't understand why women insist on making a big production out of buying clothes.",0.0,0.7748,-0.7748,BBT
+1_11697,The answer's in this puzzle box. Let's see if you can open it.,How can I make this up to you?,0.0,0.9159,-0.9159,BBT
+1_11699,"No, Stuart picked out those throw pillows all on his own.",You helped him?!,0.0,-0.4464,0.4464,BBT
+1_11773,This is why I've been saying we should keep champagne on ice.,We're getting a turtle!,0.296,0.3595,-0.0635,BBT
+1_11885,"Yeah, turns out half a dozen menorahs really sets a mood.","Wow, it looks really pretty in here.",0.296,0.8832,-0.5871999999999999,BBT
+1_11901,"Yeah, good for you, Leonard. That's a lovely little notion. Kind of like, I wish I could talk to my uncle in Chicago. Yeah, now stand back while I invent the telephone. Hello? Oh, hold on. Leonard, it's your uncle. He says you just got burned.","Oh, that's fun.",0.9326,0.828,0.10460000000000003,BBT
+1_11913,It's why my people wandered the desert for 40 years. Took that long to walk it off.,I don't think I've eaten that much in my entire life.,0.0,0.0,0.0,BBT
+1_11924,"All right, Amy's in charge of pricing and being 75.",Can you believe I got these pantyhose for a nickel?,0.0,0.4696,-0.4696,BBT
+1_12202,"No need to. As soon as she flies into California airspace, I'll feel a disturbance in the Force.",Don't you want to know for sure?,-0.5859,0.3481,-0.9339999999999999,BBT
+2_223,"I guess he wants to do a little dance, you know, make a little love. Well pretty much get down to that.",Oh really? What does he want with her?,0.8255,0.212,0.6135,FRIENDS
+2_370,You have to stop the Q-Tip when there is resistance,"My family's been going to him forever. He did my first suit when I was 15. No wait 16. Excuse me, 15 ...  Alright when was 1990?",-0.296,0.0258,-0.3218,FRIENDS
+2_556,"Joey if I go first, I want to be looking for my keys","When their pets pass on, they want them sort of laid out like they are sleeping. But, occassionally theres a person who wants them in a pose like chasing their tail or uh, jumping to catch a frizbee.",0.0772,0.631,-0.5538,FRIENDS
+2_484,Yes yes it is! In Prison!!,"That's how they do pants. First they go up they move it over, then they go up the other side and move it back, then they do the rear. What? Ross will you tell them? Isn't that how a tailor measures ?",0.4545,0.3109,0.1436,FRIENDS
+2_498,"Uh, so how many cameras are actually on you.","Shut up, the camera adds 10 pounds.",0.0,0.0,0.0,FRIENDS
+2_494,But younger than some buildings!,"I know Richard's really nice and everything, it's just that we don't know him really well you know, plus he is old  ...  er than some people.",0.0,0.669,-0.669,FRIENDS
+2_279,Sounds like she has got the whole package!,"Great. It was great. She is , uh, she is great, great looking, great personality, she is greatness",0.4199,0.9702,-0.5503,FRIENDS
+2_377,Yeah either that or gloria estefan was right eventually the rhythm is going to get you,I guess he must have gotten the part in the play.,0.296,0.34,-0.04400000000000004,FRIENDS
+2_464,"Oh, uh, no thanks. I just had an M&M.","Hey, you guys the water is great. You should really go in!",-0.3412,0.6588,-1.0,FRIENDS
+2_408,"Okay, but if you are not coming back soon, there is pretty much nothing I can do about it","Knowing you are here, waiting for me, it is kind of exciting isn't it?",0.6956,0.6378,0.05779999999999996,FRIENDS
+2_598,"Our balcony? Seriously? That's so funny because I told Monica we should put lights on our balcony. - And she said - ""No no, its too cold, nobody will go out there.""  - I said ""Maybe if we put some lights out there they will"".",After the party I saw Rachel kissing that jerk from her office out on your balcony.,0.4316,0.6124,-0.18080000000000007,FRIENDS
+2_73,"Oh my god, you almost gave me a heart attack!","Okay, I am officially unpacked. Thanks for helping me man. Joey?",0.5411,0.7184,-0.1773,FRIENDS
+2_374,Janice? Janice?,Will you get me a white zinfandel and glass of red for Janice.,0.0,0.0,0.0,FRIENDS
+2_297,"I am sorry, it was a one time thing. I was very drunk and it was someone else's subconscious",I can't belive you two had sex in her dream.,-0.4576,0.4404,-0.898,FRIENDS
+2_286,"And sometimes I would want you to steal third, and I'll go like this.","And sometimes I may be away longer, like this. But I'll still always come back, like this.",-0.1027,0.6124,-0.7151000000000001,FRIENDS
+2_509,Crazy bitch!,Well the tough thing is she really wants to have sex with me.,-0.7574,0.1531,-0.9105,FRIENDS
+2_508,"Yes, the doctor's say if they remove it, he will die!",There is a little child inside this man.,-0.3595,0.3164,-0.6759,FRIENDS
+2_227,You sure he is going to be able to crack that code?,"Well, despite the yummy bagels and palpable tension, I have got pants that need to be altered.",0.3182,-0.4545,0.7726999999999999,FRIENDS
+2_226,"These people find out that a spelling game is going over there, there will be nobody left at our party.",Could guys please try to keep It down? We are trying to start a tournament.,0.4019,0.3182,0.0837,FRIENDS
+2_478,"Oh, wait a minute, I have no one.","It was ridiculous, these guys were bullies, actual bullies. We are grown ups, this kind of stuff isn't supposed to happen anymore.",-0.296,-0.25,-0.045999999999999985,FRIENDS
+2_372,Actually I yesterday I was smoking again. Today I am smoking still.,Chandler?,0.0,-0.825,0.825,FRIENDS
+2_241,"Oh I do. Oh no, wait a minute, I took it out of my shirt when I put it on this morning.","Relax ok? I can get this open, anybody got a coat hangar?",0.0,0.2582,-0.2582,FRIENDS
+2_109,"I thought if I littered, that crying Indian might come by and save us.","Chandler, what are you doing? There is a trash can right there!",0.0258,0.0,0.0258,FRIENDS
+2_389,Huh! Whats dufus speled backwards?,ThatÕs Help spelled backwards so that helicopters can read it from the air.,0.0,0.5574,-0.5574,FRIENDS
+2_449,"Oh no, now its not gonna make any sense","He is saving your butt. Unless ofcourse I am stepping on some toes here, in which case I can just mosey on. I have plenty of people to help in the interstate.",0.0,0.4019,-0.4019,FRIENDS
+2_50,"Nope, that patch is no good.",Well I am really sick of your smoking. So I brought something that is going to help you quit.,-0.3412,0.2275,-0.5687,FRIENDS
+2_84,"If that doesn't keep kids in school, what will?",Yes she was my best teacher.,0.0,0.9186,-0.9186,FRIENDS
+2_416,Were you so late because you were burying this woman?,Ok it was just me and her at the back of the train and I sat at the door so she had to pass by me if she like to switch cars. She was totally at my mercy.,0.0,0.7553,-0.7553,FRIENDS
+2_124,I am so confused as to what we have been doing so far.,Wanna bet?,-0.4572,-0.5636,0.1064,FRIENDS
+2_206,A tshirt that says - I don't belong here.,"Hey guys, what should I wear to a Nick's game?",0.0,0.0,0.0,FRIENDS
+2_204,"Oh Oh, I am convinced!",Just do it!,0.4574,0.6892,-0.23180000000000006,FRIENDS
+2_622,"Pheebs, you may know this, you know strange things. What is the boiling point of brain?","Maybe I should get another pair. Oh, you know they had some with uh, with  fringe all down the sides.",-0.2023,0.0,-0.2023,FRIENDS
+2_583,And the bunny got away!,Sorry,0.0,-0.4765,0.4765,FRIENDS
+2_456,And you are gonna make them all disappear.,"Oh , yeah. There's this play right. And I am up for the part of this real cool like suave, international guy. A real close horse. So I figured everyone in the audition is gonna be wearing this kind of, you now, ultra hip, high fashion stuff.",-0.2263,0.9609,-1.1872,FRIENDS
+2_461,"Wow you look just like your son, Mrs. Tribbiani",[Laughs],0.743,0.4939,0.2491,FRIENDS
+2_152,Your makeup?,"Are you referring to my man's bag? At first it I thought it just look good. But its practical too, check it out! Its got compartments for all your stuff. Your wallet, your key, your addressbook.",0.0,0.3054,-0.3054,FRIENDS
+2_15,I'm sorry man there is never a good time to have to .. Stop catching on fire.,"When I had insurance I could get hit by a bus or catch on fire, it wouldn't matter. Now I got to be careful?",-0.7435,-0.2201,-0.5234000000000001,FRIENDS
+2_421,Joey's got a really bad hernia but its nothing that a laser eye surgery wont fix,"Thank you, but it would take me forever to pay  you that money back and I don't want that hanging on my head. Besides, soon as my insurance kicks in I' ll all the free operations I want. T'll probably start with that laser eye surgery.",-0.3392,0.6924,-1.0316,FRIENDS
+2_586,"See now that I see crying over, but Bambi, is a cartoon.","You know whats sadder than this? Bambi. I cried for three days with that movie. No wait two, cause on the thrid day my mother killed herself, so I was partly crying for that.",-0.2617,-0.9383,0.6766000000000001,FRIENDS
+2_39,"Oh hurry up, I want to sign that.","Its nothing, just that you can't sue the city incase you scrap your knee or your know get your head blown off.",0.0772,0.0,0.0772,FRIENDS
+2_66,"Nice jon Joe, you are quite the craftsman!",I am not finished.,0.4753,-0.3164,0.7917000000000001,FRIENDS
+2_310,Well thank God your livelihood doesn't depend on it.,"I don't know Chandler, I am not so good with remembering lines.",0.7579,-0.2092,0.9671000000000001,FRIENDS
+2_345,Oh I left them in my bulldozer .. I don't have tools!,Interesting,0.0,0.4019,-0.4019,FRIENDS
+2_581,"We were wondering what was taking so long with the gift, but now we understand you were doing this.","Quack quack, quack quack, quack quack.",0.2382,0.0,0.2382,FRIENDS
+2_518,Oh tons. I am quite the woodsman.,"Maybe we can lure them out, you know of any bird calls?",0.0,-0.354,0.354,FRIENDS
+2_450,If only there was something in your head to control the things you say.,"Remember what happened the last time I did an interview for them? I said I write a lot of my own lines, then the writers got mad and made my character fall down the elevator shaft. So who knows what I might say this time.",0.0,-0.4939,0.4939,FRIENDS
+2_567,"Well yes Ross, pressing my third nipple opens the delivery entrance to the magical land of Narnia.","So uh, does it do anything uh special?",0.5859,0.4019,0.184,FRIENDS
+2_115,"I am sorry, we donÕt have your sheep.",Hey,-0.0772,0.0,-0.0772,FRIENDS
+2_183,"No, rabies.","Hey, shaving?",0.0,0.0,0.0,FRIENDS
+2_104,Was that place the sun?,I went to their tanning place your wife suggested.,0.0,0.0,0.0,FRIENDS
+2_288,Maybe he was nervous.,"Whoa ostralopificus isn't supposed to be in that display. No, no, Homohabilus was erect, Ostralopificus was never fully erect.",-0.2732,0.0,-0.2732,FRIENDS
+2_420,"No you are not Chandler, we still love you Chandler","I don't know. I can't . I just, I can't get her out of my head you know. I am a very bad person. I am a horrible person.",0.4588,-0.3722,0.831,FRIENDS
+2_433,I was saying the actual words,And you're afraid you wont be able to fill his shoes,0.0,0.2732,-0.2732,FRIENDS
+2_168,Did I wake you?,Are you kidding me? Joey Joey Joey Joey!,0.0,0.1759,-0.1759,FRIENDS
+2_155,Great! Now we can do laundry all night. All night laundry!,I have quarters!,0.6892,0.8169,-0.12769999999999992,FRIENDS
+2_2,"ThatÕs a good one too Pheebs, now all that I have to do is find a plane load of people whose resolution is to plummet to their deaths",That's a good one. Mine is to pilot a commercial jet.,0.4404,0.4404,0.0,FRIENDS
+2_120,"You know some might find it amusing, I myself find it regular.",What an interesting approach to guitar instruction.,0.3818,0.4019,-0.020100000000000007,FRIENDS
+2_487,"And Hornswoggle? What? Are you dating a character from ""Fraggle Rock""? Ahh.","I can't take it any more! So you win, okay? Pheebs? Flying a jet? Better make it a spaceship so that you can get back to your home planet! And Ross, phone call for you today. Tom Jones, he wants his pants back!",0.0,0.8962,-0.8962,FRIENDS
+2_280,"Joey ate my last stick of gum, so I killed him. Do you think that was wrong?","Okay, I think its time to change somebody's nicotine patch.",-0.835,0.6588,-1.4938,FRIENDS
+2_447,It was an accident. Not like I was across the street with a telescope and a box of donuts.,Well what? What were you doing seeing her boobies?,-0.6381,-0.2168,-0.4213,FRIENDS
+2_148,"Hey, that's Joincidence with a C",You know what I just realized? Joker is poker with a J. Coincidence?,0.0,0.2168,-0.2168,FRIENDS
+2_532,"The Jamestown colony of Virginia. You see King George is giving us the land, so.",Settle what?,0.34,0.0,0.34,FRIENDS
+2_443,"Dear god, this parachute is a knapsack","No, what is it? Is there something fundamentally unmarriable about me?",0.5719,0.4306,0.14129999999999998,FRIENDS
+2_475,"Oh yeah ok, including the waffles last week, you now owe me, seventeen zillion dollars.","Hey, Chan. Can you help me out here, I promise I'll pay you back.",0.296,0.5574,-0.2614,FRIENDS
+2_92,"No, no, I am just looking for a man to draw on me with chalk.",You needs some clothes altered?,0.0,0.504,-0.504,FRIENDS
+2_258,"I am telling you, when she leaned back, I could see her brain","Don't tell me, because of the big nostril thing?",0.0,-0.4871,0.4871,FRIENDS
+2_376,Me? I am gonna die alone!,Hey Chandler? Monica just broke my sea-shell lamp.,-0.7345,-0.4215,-0.31300000000000006,FRIENDS
+2_114,Spanish midgets wrestling Julie! Okay yes I see how they got there.,"Man, I sure miss Julie",0.5983,0.1779,0.42040000000000005,FRIENDS
+2_246,"Well, it will probably slow me down at first. But once I am used to the extra weight, I ll get back on track.",You have any idea what this will do to your sex life?,0.1406,-0.8534,0.994,FRIENDS
+2_369,"I just have to do one thing, really quickly, its not a big thing  ...  GET UP||","You guys, you know what? it doesn't matter. Because you both have to go get dressed before the big vein in my head pops!",0.0,-0.6159,0.6159,FRIENDS
+2_103,"No, this is just part of a daredevil game that I play called wait until last moment before I burst and die",Someone in there?,-0.25,0.0,-0.25,FRIENDS
+2_457,"Yes, we all know how cruel a parent can be, about the flatness of a child's pillow.",I just don't wanna give them any more ammunition than they already have.,-0.2732,0.0,-0.2732,FRIENDS
+2_112,I think this is probably why Damone smokes in his cell alone.,Smoke away!,-0.25,0.1511,-0.4011,FRIENDS
+2_174,Oh! Satan's minions at work again?,And there's five hundred extra dollars in my account.,0.0,0.0,0.0,FRIENDS
+2_490,"Maybe it's a contest, you know? Like ""Collect all five"".","I know, I opened it up and it  and there it was just floathing in there, like this tiny little hitchhiker.",0.3612,0.3612,0.0,FRIENDS
+2_430,I guess you would know that or else we would be in a predicament room,Listen it's kind of an emergency,0.0,-0.3818,0.3818,FRIENDS
+2_434,We can? Ok I am trying that.,You guys can pee standing up.,0.296,0.0,0.296,FRIENDS
+2_541,Oh yeah right. And what would my opening line be? Excuse me,Go over to her. She's not with anyone.,0.3612,0.0,0.3612,FRIENDS
+2_392,Ah you see perfect might be a problem. Had you said co-dependent or self-destructive.,Because I met somebody who would be perfect for you.,0.25,0.5719,-0.32189999999999996,FRIENDS
+2_187,That's so funny because you look more like Joey Tribbiani man slash woman.,"Yes I am, as of today, I am official Joey Tribbiani actor slash model.",0.5975,0.0516,0.5459,FRIENDS
+2_113,"No, no the actual cartoon character .. Of course the baloon.",The most unbelievable thing has happened. Underdog has gotten away.,-0.296,0.2716,-0.5676,FRIENDS
+2_323,That monkey has got a Ross on its ass!,Hey!,-0.5848,0.0,-0.5848,FRIENDS
+2_294,"Oh, um, I don't care!",How do I look?,-0.4442,0.0,-0.4442,FRIENDS
+2_359,"You know once you are inside, you don't have to knock anymore.",Hey,0.0,0.0,0.0,FRIENDS
+2_141,We think it was trying to spell out monkey.,He also found an M and an O.,0.0,0.0,0.0,FRIENDS
+2_283,Dee. The sarcastic sister from What's Happening.,Who?,-0.25,0.168,-0.41800000000000004,FRIENDS
+2_24,"Uh, okay. The fifth dentist caved and not they're all recommending Trident?","Guys, guess what guess what guess what.",0.2263,-0.3786,0.6049,FRIENDS
+2_197,Ah your own brand of vigilante justice.,"No, we took her to lunch",0.5267,0.0,0.5267,FRIENDS
+2_493,Did you tell her about the magical night that starts with the flush of every toilet?,"So Ross, how was the date the other night?",0.0,0.0,0.0,FRIENDS
+2_573,"Oh I see, I thought you just really really liked your new couch.","No, that's my arm.",0.5222,0.7815,-0.2593,FRIENDS
+2_440,"No its not big, not at all. Kind of the same lines as, I don't know, having a third nipple!",I didn't know it was a big secret.,-0.3595,-0.6486,0.28909999999999997,FRIENDS
+2_105,Why? You never look down in the shower?  Oh please I am allowed one joke in the monkey is penis genre.,This is so exciting! I haven't seen my monkey in almost a year,0.594,0.6606,-0.06659999999999999,FRIENDS
+2_3,And I think my testicles may be in here too,"Oh yeah sure, what do you need? We got lace, satin, sateen, rafia, gingam , felt.",0.0,0.594,-0.594,FRIENDS
+2_71,"ThatÕs good, just keep rubbing your head. That will turn back time","No, no, no, the love part? Oh my god!",0.4404,0.9416,-0.5012,FRIENDS
+2_172,The whole thing! Can we go?,Which part exactly?,0.0,0.837,-0.837,FRIENDS
+2_163,"Oh boy, I just can't watch. It's too scary!",Rach? What are you doing?,-0.5411,0.0,-0.5411,FRIENDS
+2_406,For what? For letting you throw me out of your office?,I was gonna give you a chance to apologise to me.,0.0,0.5106,-0.5106,FRIENDS
+2_423,Like I have nothing better to do!,"Ohh ..  Oh, that's okay I hate when people come back to complement the chef.",0.0992,-0.4753,0.5745,FRIENDS
+2_313,"Oh sure, go with the sissy.",Yeah.,0.3182,0.8256,-0.5074000000000001,FRIENDS
+2_186,"Excellent hole, Joe.","Hey, you guys! Take a look at this!  Check this baby out, dug me a hole!",0.5719,0.0,0.5719,FRIENDS
+2_611,Just tell me how.,Oh. Well then shut me up.,0.0,0.8264,-0.8264,FRIENDS
+2_429,"I really, really enjoyed it. Very exotic.","Very good,  so good.",0.5956,0.8203,-0.2247,FRIENDS
+2_357,"Stating the obvious, but thank you. And it's not weird is it.",Nice! Wow Phoebe you are good!,0.6158,0.9401,-0.32430000000000003,FRIENDS
+2_282,What-wh-what so we'll just stay married forever?,"Wow! This is so amazing. I uh, I really thought I'd have to talk you into this more.",0.0,0.8738,-0.8738,FRIENDS
+2_43,"Well, y'know I'm 29. I mean who needs a savings account.","A TV as if it appears from nowhere! That's the dream! Man, how did you afford this stuff?",0.2732,0.695,-0.42179999999999995,FRIENDS
+2_575,Why? Because she can sing and play guitar and do both at the same time?,I like her.,0.4137,0.8997,-0.48600000000000004,FRIENDS
+2_177,I can show you an ID if you want?,This is Bonnie?  This is Bonnie?  You're Bonnie?,0.0772,0.0,0.0772,FRIENDS
+2_617,And protected them from a tornado?,"Okay, so I",0.4404,-0.1935,0.6339,FRIENDS
+2_341,"Well, I'd gotten Judy pregnant. I still don't know how that happened.","Oh, I don't think I ever heard that story.",0.2732,0.4019,-0.12869999999999998,FRIENDS
+2_318,Was it not pain-free?,Okay.  Ow!!!!! Ow-oh-oh!,0.0,0.7156,-0.7156,FRIENDS
+2_250,"Oh, you say someone's name enough, they turn around.",Oh my God!,0.0,0.8513,-0.8513,FRIENDS
+2_560,So now I have to go so he'll think that I'm totally ok with seeing him!,"And she was like ""Oh, don't worry! I asked him. He's totally ok with seeing you!"".",0.4186,0.7896,-0.37099999999999994,FRIENDS
+2_248,"I mean, you and I we're just, y'know, we're nothing, we're goofin' around.","Oh, is this about you-you dating the nurse? Yeah, Joey already told me, and I am so-so fine.",0.0,0.4588,-0.4588,FRIENDS
+2_260,"Okay, are you aware unagi  is an eel?",Unagi. I'm always aware.,0.2263,0.0,0.2263,FRIENDS
+2_542,"Uh, Rachel's here, so good luck man, let me know how it works out.","Dude, what am I gonna",0.7917,0.3382,0.45349999999999996,FRIENDS
+2_504,"All right, okay, well, apparently not!","So you like the drums! That's, that's great! Y'know, I was worried, that, you know, they would maybe an unbearable living situation.",0.5093,0.7401,-0.2308,FRIENDS
+2_54,"That's easy for you to say, you weren't almost just killed.","Joey, please don't do that. I think it's best that we just forget about it.",0.7418,0.8779,-0.1361,FRIENDS
+2_474,Lovely,About a half an hour.,0.5859,0.0,0.5859,FRIENDS
+2_189,"Yeah okay, I was just talking to the guys. Just look at them I mean, is it okay if they come visit?",We're supposed to meet my parents in 15 minutes.,0.6124,0.0,0.6124,FRIENDS
+2_550,All right I'll have one.,"No, no, it's just my tooth.",0.0,0.2263,-0.2263,FRIENDS
+2_151,"Yeah, I mean, it would be rude to them for us to leave now.","Well maybe, you know, maybe we should stay for one song.",-0.25,0.5106,-0.7606,FRIENDS
+2_254,"Yeah. Yeah, that's what you need a good .. pill.","I go see my doctor tomorrow, I'll ask her about this. Maybe she can give me a pill or something.",0.743,0.296,0.447,FRIENDS
+2_31,"Even if people are on it!""","You know what else I'm not gonna miss? ""I'm Monica. I wash the toilet 17 times a day.",0.0,0.1139,-0.1139,FRIENDS
+2_315,"I guess you'd know that, being one of the two of us, though, right?","So. I just thought the two of us should hang out for a bit. I mean, you know, we've never really talked.",0.0,0.0,0.0,FRIENDS
+2_548,"Almost! But first, we gotta start.",So were done then!,0.0,0.453,-0.453,FRIENDS
+2_128,You building a post office?,"Hey, we know how we always say we need a place for the mail? Well I started building one, but then, I decided to take it to the next step.",0.0,0.1406,-0.1406,FRIENDS
+2_247,Uh yes! Thank you.,Am I interrupting?,0.6696,0.34,0.32959999999999995,FRIENDS
+2_97,It would be nice to have a little guarantee though.,"Yeah, I'm pretty confident about that. That's what makes it so easy for me to be 80% happy for Monica and Chandler!",0.5434,0.9603,-0.41690000000000005,FRIENDS
+2_410,If you wanna put a label on it.,You mean they're lovers.,0.0,0.8591,-0.8591,FRIENDS
+2_558,I can see it from right here. It'll cost you one husband.,My boots in tan! Hey! Can you get a little closer so I can see the price?,0.0,-0.814,0.814,FRIENDS
+2_289,"Nooo! No, that's not true. No, best time ever! Yeah, you rocked my world!",No. We were in the middle of sex .. and,-0.6571,0.296,-0.9531000000000001,FRIENDS
+2_102,No Blanche she is upset because they keep changing the taste of coke.,Is this about Arnie?,-0.5859,0.4871,-1.073,GOLDENGIRLS
+2_351,"No Rose, she is depressed because Marvel had manners on only once a week",Do you think she is depressed about Rebecca,-0.4019,-0.765,0.36310000000000003,GOLDENGIRLS
+2_350,"No Rose, I am nervous because Sonny Bono gets elected mayor of Palm Springs, he is gonna make all the postmens wear leather bell bottoms and a fur vest.",Are you nervous cause you haven't met Michael's fiancee?,-0.5106,-0.2289,-0.28170000000000006,GOLDENGIRLS
+2_587,"Oh yes Blanche, about a half hour ago. But now I have hidden her again so you can find her.",Have you found her?,0.2144,0.0,0.2144,GOLDENGIRLS
+2_612,"I don't know Rose, maybe Marry Poppins has an Italian cousin.",What about us? Whose gonna keep after us. Make us linguini and tell us story about Cicily.,0.0,0.2644,-0.2644,GOLDENGIRLS
+2_89,On the home shopping network,Where did it turn up Dorothy?,0.0,0.6705,-0.6705,GOLDENGIRLS
+2_599,No I am upset because crocodin turbs are wearing darker colors.,I guess you are still upset with me about last night aren't you?,-0.5859,-0.3818,-0.2041,GOLDENGIRLS
+2_182,The liberarche marquee at Caesar's palace,Whats coming down?,0.0,0.0,0.0,GOLDENGIRLS
+2_292,"No, she is going to sit here where itÕs a 112 degrees and eat enchiladas.",You going out?,0.0,0.0,0.0,GOLDENGIRLS
+2_489,"No, its because I cannot make any sense of those commercials for obsession.",Is it because you threw Michael out?,-0.34,-0.6997,0.35969999999999996,GOLDENGIRLS
+2_390,"No, I am depressed becaues Phillis George left the morning news.",Are you depressed about Glen?,-0.5106,-0.5106,0.0,GOLDENGIRLS
+2_378,"No Blanche, with a venus fly trap",With a man?,-0.5423,0.6486,-1.1909,GOLDENGIRLS
+2_9,"No Rose, go to the corner and open a stand",Shall I set this down someplace?,-0.296,0.0,-0.296,GOLDENGIRLS
+2_144,Lords of Arabia,What movie?,0.0,0.2732,-0.2732,GOLDENGIRLS
+2_479,No I am worried she might be Phir Resuda's,You worried she might be Gina's?,-0.5267,-0.3535,-0.17319999999999997,GOLDENGIRLS
+2_45,"Oh ma no, it was a little girl selling girl scout toilets.",Is that Paolo?,0.0,0.2714,-0.2714,GOLDENGIRLS
+2_507,"No, I haven't taken her out of the trunk of the car yet.","Sophia was discharged, is she here?",0.0,0.0,0.0,GOLDENGIRLS
+2_398,"Rose, you should sit here and watch her hack herself to death","Dorothy, should I get Sophia a glass of water?",-0.5994,0.0,-0.5994,GOLDENGIRLS
+2_281,"Ofcourse no Ma, I am referring to Carrey Grant, he is living in the broom closet.",Are you referring to me?,0.0772,-0.1027,0.1799,GOLDENGIRLS
+2_462,"No Rose, at a pie eating contest.",You mean at a funeral?,-0.296,-0.6809,0.38489999999999996,GOLDENGIRLS
+2_505,To feed the cat Rose.,Why would she need a kidney?,0.0,0.0,0.0,GOLDENGIRLS
+2_74,Show them your slides of Hawaii,"Wait donÕt leave me, what will I do if they come back?",0.0,-0.0516,0.0516,GOLDENGIRLS
+2_126,No I am upset because Joe Piscapo didn't get the lead role in rain man.,Are you upset because Blanche is going to sell the house and we can't live together.,-0.5859,-0.5859,0.0,GOLDENGIRLS
+2_158,A bucket of chicked. I hope you like it extra flat and crispy,What you get?,0.6597,0.0,0.6597,GOLDENGIRLS
+2_255,It's a musical Rose,What kind of a movie is this Dorothy?,0.0,0.0,0.0,GOLDENGIRLS
+2_502,I'm worried about whether Michael Jackson will be able to buy the remains of the elephant man.,Still worried about the money you owe the government?,-0.296,-0.296,0.0,GOLDENGIRLS
+2_11,His cappucino maker.,Whats under the sheets?,0.0,0.0,0.0,GOLDENGIRLS
+2_135,"No, she I supset because Jimmy Swaager can't cover his motel bill",Are you upset because you don't know what to do about Al?,0.0,-0.7783,0.7783,GOLDENGIRLS
+2_442,No itÕs the rose in the kitchen thing.,"Just to keep me upto speed Dorothy, it is this negligent arson that prospect of spending the rest of her wiening years in jail thing right?",-0.296,-0.25,-0.045999999999999985,GOLDENGIRLS
+2_342,"In what Blanche, dog years?","Momentarily. This is strictly off the record, but Dirk's nearly five years younger that I.",0.0,-0.1901,0.1901,GOLDENGIRLS
+2_492,"I'm sorry Sophia, but in Dorothy's defence, it sure sounds a lot like her.",What you think of the only grey head substitute teacher named Dorothy wasting her life away in Miami?,0.7684,0.1926,0.5758,GOLDENGIRLS
+2_512,Because it wears a little sunbrella Rose.,How did they know its Spanish?,0.0,0.669,-0.669,GOLDENGIRLS
+2_121,What was I doing? My ben gazara in person?,It needs to hear a feminine voice.,0.0,-0.2263,0.2263,GOLDENGIRLS
+2_129,What are these? Claws?,Oh I didn't try. I don't wanna risk cracking a nail.,0.0,0.2901,-0.2901,GOLDENGIRLS
+2_222,"The little man who lives in there, who turns the light on and off will tell you.",How would I know if they fog up?,0.0,0.0,0.0,GOLDENGIRLS
+2_604,"No Rose, I am developing pictures from the magellan space probe","Hi Dorothy, cooking?",-0.296,0.0,-0.296,GOLDENGIRLS
+2_352,"No Rose, it stands alone.","Do you have to see 1, 2 and 3 to appreciate it?",-0.4939,0.4696,-0.9635,GOLDENGIRLS
+2_344,A hand puppet Rose.,With what?,0.4939,0.0,0.4939,GOLDENGIRLS
+2_465,"No Rose, that you should do.",And I am not gonna go Niagra falls in a barrel.,-0.296,-0.296,0.0,GOLDENGIRLS
+2_471,Amazing.,Hello everybody! How was your week?,0.5859,0.0,0.5859,SARCASMOHOLICS
+2_361,Nooo,"Hi everybody, my name is Scott and I am a sarcasmholic.",0.0,0.5574,-0.5574,SARCASMOHOLICS
+2_190,Well scott I am sure we are all really really looking forward to hear your story.,I finally got to admit it to myself. I have got a sarcasm problem.,0.5267,-0.4215,0.9481999999999999,SARCASMOHOLICS
+2_271,Sarcasm? Noo.,"Sorry, was that sarcasm?",-0.2263,-0.296,0.06969999999999998,SARCASMOHOLICS
+2_306,"No, no no, I just mediate the gorup. I just give up every Tuesday of my life to help these screwups for the good of my health",Sarcasmholic yourself?,0.34,0.0,0.34,SARCASMOHOLICS
+2_209,Really?,"He doesn't need to be sarcastic. I mean, that was sarcasm wasn't it?",0.0,-0.4404,0.4404,SARCASMOHOLICS
+2_312,Sarcasm? At a sarcasmoholics meeting?,Alright! Definitely!,-0.3094,0.6467,-0.9561000000000001,SARCASMOHOLICS
+2_485,You got off to a really good start with the group.,"Oh, we wouldn't bother.",0.4927,0.4023,0.09040000000000004,SARCASMOHOLICS
+2_527,We thought you were just here for the company. He is a sarcasmoholic Stewart.,Nooo.,0.0,0.0,0.0,SARCASMOHOLICS
+2_596,Noooo. Really?,I am having a bit of trouble telling when people are sarcastic.,0.0,-0.5719,0.5719,SARCASMOHOLICS
+2_123,Nooo!,It was quite hard .. Was just being sarcastic!,0.0,-0.4561,0.4561,SARCASMOHOLICS
+2_140,Sarcastic? Us? Nooo.,No seriouslty.,-0.3313,-0.296,-0.0353,SARCASMOHOLICS
+2_338,And I am sure every person here really really wants you to join our group.,"I mean, you seem like a decent guy.",0.5423,0.7783,-0.236,SARCASMOHOLICS
+2_381,Noo..,[nodding] - Was that sarcasm?,0.0,-0.2263,0.2263,SARCASMOHOLICS
+2_511,"You said you spent all that money because those boots go with skirts, dresses and pants. What do you plan on wearing? A Chicken suit?",And the boots don't really go with it.,0.0,0.0,0.0,FRIENDS
+2_287,"Oh I am sorry, do you need a break?",Oh wait stop! Stop! Stop!,-0.0772,-0.7562,0.6789999999999999,FRIENDS
+2_161,I can see it from right here. It'll cost you one husband.,Can you give me a closer look so that I can see the price?,0.0,0.0,0.0,FRIENDS
+2_589,Well why don't you check in one of my saddle bags while I chew on a bale of hay.,"Well I don't have them either, where are they?",0.2732,0.2023,0.07089999999999999,FRIENDS
+2_523,"Well, I'm a headhunter. I hook up out of work Soviet scientists with rogue third-world nations. Hi Rasputin!","I said ""a little bit"" Ross.",0.3382,0.0,0.3382,FRIENDS
+2_491,"Let me think! Let me think! Oh, I don't care.",The wheel or pick a Google card.,-0.4959,0.0,-0.4959,FRIENDS
+2_170,The British are coming?,"Hey you guys, guess what?",0.0,0.0,0.0,FRIENDS
+2_500,Oh my God I love that! - Really? - NO!,I want to show you something too. You know those big road signs that say Merge? So I was thinking that we could get one fo those signs and hang it over the bed. Because its you and I together - Merge!,0.7835,0.1511,0.6324,FRIENDS
+2_303,No thanks Josephine!,"Hey Chandler!, come on in we are knitting pot holders.",-0.4015,0.0,-0.4015,FRIENDS
+2_178,"This is so good, that I am gonna enjoy it in the balcony. I can enjoy my view, whilst I enjoy my desert.",Mmm,0.9237,0.0,0.9237,FRIENDS
+2_438,Really? Struck down in the prime of life.,"Chandler, I think I am sick",-0.3167,-0.5106,0.19390000000000007,FRIENDS
+2_167,"I am not freaking out, why would I be freaking out? A woman named Hildy called and said we will get married, but that happens everyday","I am so sorry, please stop freaking out.",-0.0603,-0.5309,0.4706,FRIENDS
+2_373,I was making a coconut phone with a professor.,Where the hell have you been?,0.0,-0.6808,0.6808,FRIENDS
+2_623,What do you know? Its a treat for the eyes and the ears.,I think I can see your scalp!,0.4019,0.0,0.4019,FRIENDS
+2_236,"Gee, if only she were one and had no idea what a birthday was.","No, it won't be her real birthday.",-0.296,0.7579,-1.0539,FRIENDS
+2_546,"Oh sure, she was probably up all night excited about the party she knows is happening.",Oh she is still napping.,0.7506,0.0,0.7506,FRIENDS
+2_242,Are you still enjoying your nap?,"Hi Emma, it's the year 2020.",0.5267,0.2263,0.30039999999999994,FRIENDS
+2_169,"Hes not right for the part, and if I suggest him my bosses are going to think I am an idiot. And thatÕs something they should learn on their own.",Just pass the tape along.,-0.5106,0.0,-0.5106,FRIENDS
+2_34,Is it me or the greetings gone downhill around here?,You son of a bitch!,0.4215,-0.6239,1.0453999999999999,FRIENDS
+2_608,"You are right, by saying nice, I am virtually licking her.",Dude. You're married to my sister.,0.4215,0.6249,-0.20340000000000003,FRIENDS
+2_524,"Yes and we are ""very"" excited about it.","Anyway, if you don't feel like being alone tonight, Joey and Chandler are coming over to help put together my new furniture.",0.659,-0.1053,0.7643,FRIENDS

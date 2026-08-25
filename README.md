@@ -113,19 +113,80 @@ intensity-peak-based stress contrast / inter-onset-interval regularity.
 - Final rhythm set (`stress_contrast`, `ioi_cv`, `rpvi_pause_filtered`) raised balanced F1 0.591 → **0.603**
   (BBT 0.586, FRIENDS 0.621).
 
-### Final model
+### Phase 4 — Is "sarcasm" one thing, or two? (affiliative vs. aggressive irony)
 
-20 show-normalized features → `StandardScaler` + RBF-`SVC` (`C=10`, `gamma="scale"`), evaluated LOSO:
+Hypothesis: MUStARD's binary `sarcasm` label conflates two pragmatically different acts — biting/critical irony
+("bite") and affiliative/playful irony ("humor") — and these might have distinct acoustic signatures.
+
+- First tried a lexicon shortcut (VADER sentiment on the utterance, then on the context-vs-utterance sentiment
+  *gap*, as an irony-strength proxy). Both failed for the same reason: word-level sentiment can't tell "negative
+  words because it's a genuine insult" from "negative words because it's an absurd, dark joke" (e.g. "Joey ate my
+  last stick of gum, so I killed him" scored as the *most negative* line in the dataset, despite being a joke).
+- Abandoned the lexicon and manually judged all 345 sarcastic utterances (utterance + context) on two axes —
+  direct↔ironic and friendly↔hostile — producing 4 quadrants: praise, criticism, **bite** (ironic+hostile),
+  **humor** (ironic+friendly). See [`quadrant_labels.py`](quadrant_labels.py).
+- Result ([`analyze_quadrants.py`](analyze_quadrants.py)): bite is 76% BBT, humor is spread across shows. Pooled,
+  bite looked far more dissonant than humor (p=0.0048 for `dissonance_mean`) — but that difference **completely
+  vanished after controlling for show** (ANCOVA p=0.91). It was the BBT-vs-other-shows confound in disguise, not
+  a bite/humor difference. None of the 12 features tested survived show control.
+- Honest takeaway: with this sample size (66 vs. 121, near-total confounding with show) we can't conclude the
+  affiliative/aggressive distinction is acoustically real *or* that it isn't — the design can't separate the two
+  cleanly. What we can say is it isn't needed for the coarser sarcastic-vs-not detection task, where the Phase
+  1-3 markers already work regardless of a line's underlying tone.
+
+### Phase 5 — Dimensional emotion (Valence / Arousal / Dominance)
+
+Tried correlating VAD (the standard 3-dimensional emotion model) against every acoustic feature so far.
+
+- **Text-side VAD**: word-level lookup against the NRC-VAD Lexicon (Mohammad 2018, [`data/vad-nrc-lexicon.csv`](data/vad-nrc-lexicon.csv)) averaged per utterance ([`compute_text_vad.py`](compute_text_vad.py)).
+- **Result**: essentially zero correlation between text-VAD and any of our ~30 acoustic features, sarcastic or
+  not (even the textbook arousal↔F0 relationship: r=0.016, p=0.69). Likely explanation: this is *scripted,
+  acted* dialogue — delivery follows comedic timing/character voice, not the literal emotional weight of the
+  words, so text-content and vocal-delivery are largely decoupled regardless of sarcasm. This is itself a
+  reasonable argument for why MUStARD is multimodal by design.
+- **Audio-side VAD, attempt 1 (rejected)**: a hand-built linear composite of features we already had (e.g.
+  audio-valence from `hnr_mean` − `dissonance_mean` − jitter − shimmer). Circular by construction — it partly
+  re-encodes findings we already had (like the dissonance effect) rather than testing anything new.
+- **Audio-side VAD, attempt 2 (real model)**: switched to `audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim`
+  ([`extract_audio_vad.py`](extract_audio_vad.py)), a wav2vec2 model fine-tuned on MSP-Podcast to regress
+  arousal/dominance/valence directly from audio. Needed its own venv (`.venv_vad`) — this torch build only
+  supports numpy<2, incompatible with librosa/scipy's numpy>=2 in the main env. Also hit a real bug: the
+  checkpoint stores its positional conv embedding with old-style `weight_norm` params (`weight_g`/`weight_v`),
+  but this torch version's parametrization expects different internal names, so `from_pretrained` was silently
+  leaving that layer randomly initialized. Fixed by reconstructing the true weight from the checkpoint via
+  `torch._weight_norm(v, g, dim=2)` and injecting it directly — verified against a silence input (near-neutral
+  output) and real utterances (sensible, varied output) before trusting it.
+- **Result ([`analyze_audio_vad.py`](analyze_audio_vad.py))**: with the real model, sarcastic utterances score
+  significantly **higher** on all three dimensions — arousal, dominance, *and* valence (all p<0.0001, survives
+  show-control). The valence direction is counterintuitive until you separate constructs: this model was trained
+  to recognize expressive, animated, confident-sounding delivery as positive-valence, which is exactly how a
+  well-delivered punchline sounds regardless of how cutting its content is — this doesn't contradict the earlier
+  dissonance/HNR finding (voice roughness), it's a different axis (holistic expressiveness vs. timbre).
+- **Cross-modal gap** (does audio-VAD vs. text-VAD *mismatch* predict sarcasm, i.e. an irony-detector via
+  modality disagreement?): gap is smaller, not larger, for sarcastic lines (p<0.0001) — opposite of the
+  hypothesis. But a variance check shows sarcastic utterances have systematically lower variance in *both*
+  audio-VAD and text-VAD (crafted punchlines are more uniform than average dialogue), which alone would shrink
+  the raw gap mechanically. This held even with the real audio model, so the finding is unresolved, not
+  refuted — testing it properly needs a gap metric that isn't confounded by dispersion differences.
+
+### Final model (v1: acoustic + V/A/D)
+
+23 show-normalized features → `StandardScaler` + RBF-`SVC` (`C=10`, `gamma="scale"`), evaluated LOSO
+([`train_final_model.py`](train_final_model.py)):
 
 | Group | Features |
 |---|---|
 | Harmony/prosody (13) | `f0_mean/std/range`, `jitter_local`, `shimmer_local`, `hnr_mean`, `voiced_ratio`, `speaking_rate_proxy`, `energy_std`, `dissonance_mean/std`, `inharmonicity_mean/std` |
 | Melody (4) | `melodic_path_length`, `direction_change_rate`, `final_initial_diff`, `num_notes_per_sec` |
 | Rhythm (3) | `stress_contrast`, `ioi_cv`, `rpvi_pause_filtered` |
+| Audio V/A/D, wav2vec2 (3) | `audio_arousal_wav2vec`, `audio_dominance_wav2vec`, `audio_valence_wav2vec` |
 
-**Balanced (BBT+FRIENDS) show-independent F1 = 0.603**, up from 0.494 (unnormalized) / 0.583 (harmony-only, show-normalized) at the start of this exploration.
+**Balanced (BBT+FRIENDS) show-independent F1 = 0.607**, up from 0.494 (unnormalized) → 0.583 (harmony only) →
+0.591 (+ melody) → 0.603 (+ rhythm) → 0.607 (+ audio V/A/D) over the course of this exploration. The V/A/D
+addition is the smallest single increment (+0.004) — most of its signal overlaps with features already in the
+model (arousal with `energy_std`/`speaking_rate_proxy`, dominance with `f0_mean`, valence with `hnr_mean`/`dissonance_mean`), consistent with it being a real but largely redundant confirmation rather than new information.
 
-### Lessons that generalized across all three phases
+### Lessons that generalized across the whole exploration
 
 1. **Random CV lies here.** Every "improvement" was re-checked show-independent before being believed; several
    looked like wins under random CV and were actually show-identity leakage.
@@ -139,6 +200,14 @@ intensity-peak-based stress contrast / inter-onset-interval regularity.
 5. Literal music-theory transplants (major/minor key-fit) were the weakest link: they assume a discretized,
    quantized pitch system that continuous speech F0 doesn't actually have. The prosodic/timbral analogues
    (dissonance, HNR) worked; the literal scale-degree framework didn't.
+6. **Lexicon-based text sentiment cannot separate "dark joke" from "genuine insult"** — both look equally
+   negative to a word-counter. Judging tone required actually reading each line in context; there's no
+   dictionary shortcut for it.
+7. **A statistically strong group difference (real audio-VAD, p<0.0001) still only added +0.004 F1** once
+   combined with everything else — significance and multivariate marginal value are genuinely different
+   questions, confirmed again with a properly validated external model, not just our own hand-built features.
+8. When two independent measurements move together (the audio/text VAD gap shrinking for sarcasm), check
+   variance before concluding they *agree* — shrinking dispersion in both measurements can mimic convergence.
 
 ### Files
 
@@ -150,4 +219,12 @@ intensity-peak-based stress contrast / inter-onset-interval regularity.
 | `train_harmonic_svm.py` | Baseline SVM: random-CV vs. single-split show-independent eval |
 | `train_harmonic_svm_normalized.py` | Adds show/speaker normalization |
 | `train_combined_svm.py` | Harmony+MFCC combination + permutation importance |
-| `data/harmonic_features.csv` | Final extracted feature table (690 rows) with labels |
+| `quadrant_labels.py` | Manual direct/ironic × friendly/hostile judgments for all 345 sarcastic utterances |
+| `analyze_quadrants.py` | Phase 4: bite-vs-humor acoustic comparison (pooled + show-controlled) |
+| `compute_text_vad.py` | Text-side V/A/D via the NRC-VAD Lexicon |
+| `extract_audio_vad.py` | Audio-side V/A/D via wav2vec2 (includes the weight_norm checkpoint fix) — run in `.venv_vad` |
+| `analyze_audio_vad.py` | Phase 5: sarcasm-vs-VAD tests + the cross-modal gap analysis |
+| `train_final_model.py` | Final 23-feature model, LOSO-evaluated |
+| `data/harmonic_features.csv` | Harmony/melody/rhythm feature table (690 rows) with labels |
+| `data/audio_vad.csv` | wav2vec2 audio V/A/D per utterance |
+| `data/vad-nrc-lexicon.csv` | NRC-VAD Lexicon (Mohammad 2018), used by `compute_text_vad.py` |

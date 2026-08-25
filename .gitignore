@@ -1,7 +1,9 @@
 .venv/
 .venv312/
+.venv_vad/
 __pycache__/
 *.pyc
+*.pt
 data/raw/
 data/audios/
 data/temp/
