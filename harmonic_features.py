@@ -122,6 +122,77 @@ def prosody_features(sound: parselmouth.Sound) -> dict:
     }
 
 
+# --- Glide-excluded jitter/shimmer -------------------------------------------
+# jitter_local/shimmer_local are meant to measure cycle-to-cycle *perturbation*
+# in an otherwise steady voice, but Praat's built-in guard (excluding period
+# pairs with ratio > 1.3) doesn't fully protect them: a real synthetic test (a
+# steady tone with a single fast pitch glide covering only ~14% of the
+# duration) showed jitter inflate ~11x and shimmer ~9x from that one glide
+# alone. This variant restricts the same Praat jitter/shimmer calls to only
+# the glide-excluded "stable" time ranges (same velocity-threshold logic as
+# scale_features_stable/segment_notes), duration-weighting the per-segment
+# results.
+
+def _stable_intervals(f0_track: np.ndarray, hop_s: float, glide_threshold: float = 8.0,
+                       min_duration: float = 0.05):
+    """Contiguous (start_time, end_time) ranges where local pitch velocity
+    stays below glide_threshold (or is unmeasurable), each >= min_duration."""
+    voiced = f0_track > 0
+    speed = _voiced_pitch_velocity(f0_track, hop_s)
+    stable = voiced & (np.isnan(speed) | (speed < glide_threshold))
+
+    intervals = []
+    idx, n = 0, len(stable)
+    while idx < n:
+        if stable[idx]:
+            j = idx
+            while j < n and stable[j]:
+                j += 1
+            start, end = idx * hop_s, (j - 1) * hop_s + hop_s
+            if end - start >= min_duration:
+                intervals.append((start, end))
+            idx = j
+        else:
+            idx += 1
+    return intervals
+
+
+def jitter_shimmer_stable_features(sound: parselmouth.Sound, hop_s: float = 0.02,
+                                    glide_threshold: float = 8.0) -> dict:
+    pitch = sound.to_pitch(time_step=hop_s)
+    f0_track = pitch.selected_array["frequency"]
+    intervals = _stable_intervals(f0_track, hop_s, glide_threshold)
+
+    point_process = parselmouth.praat.call(sound, "To PointProcess (periodic, cc)", 75, 500)
+    jitters, shimmers, weights = [], [], []
+    for start, end in intervals:
+        duration = end - start
+        try:
+            j = parselmouth.praat.call(point_process, "Get jitter (local)", start, end, 0.0001, 0.02, 1.3)
+            if not np.isnan(j):
+                jitters.append(j)
+                weights.append(duration)
+        except Exception:
+            pass
+        try:
+            s = parselmouth.praat.call(
+                [sound, point_process], "Get shimmer (local)", start, end, 0.0001, 0.02, 1.3, 1.6)
+            if not np.isnan(s):
+                shimmers.append(s)
+        except Exception:
+            pass
+
+    def weighted_mean(values, weights):
+        if not values:
+            return np.nan
+        return float(np.average(values, weights=weights[:len(values)]))
+
+    return {
+        "jitter_local_stable": weighted_mean(jitters, weights),
+        "shimmer_local_stable": weighted_mean(shimmers, weights),
+    }
+
+
 def rhythm_features(sound: parselmouth.Sound) -> dict:
     intensity = sound.to_intensity()
     values = intensity.values[0]
@@ -364,6 +435,79 @@ def scale_features(sound: parselmouth.Sound, hop_s: float = 0.02) -> dict:
         "wholetone_fit": wholetone_fit,
         "majorness": major_fit - minor_fit,
         "tonal_clarity": float(tonal_clarity),
+    }
+
+
+# --- Glide-excluded scale features -------------------------------------------
+# scale_features() treats every voiced F0 sample as equally informative about
+# "which note this is" -- but a large fraction of continuous speech pitch is
+# mid-glissando, sliding between targets rather than resting on one. Those
+# transitional samples pass through pitch classes that were never "intended",
+# diluting the scale-fit signal. This variant estimates local pitch velocity
+# (semitones/sec between consecutive voiced frames) and excludes samples above
+# a glide-speed threshold, keeping only the more plateau-like, stable pitches.
+
+def _voiced_pitch_velocity(f0_track: np.ndarray, hop_s: float, ref_freq: float = 440.0) -> np.ndarray:
+    """Per-sample local pitch speed (semitones/sec), NaN where no valid
+    neighboring voiced frame exists to estimate it from (so those samples are
+    kept, not spuriously excluded, by a >= threshold comparison)."""
+    voiced_mask = f0_track > 0
+    midi = np.full(len(f0_track), np.nan)
+    midi[voiced_mask] = 69 + 12 * np.log2(f0_track[voiced_mask] / ref_freq)
+
+    speed = np.full(len(f0_track), np.nan)
+    for i in range(len(f0_track)):
+        if not voiced_mask[i]:
+            continue
+        local = []
+        if i > 0 and voiced_mask[i - 1]:
+            local.append(abs(midi[i] - midi[i - 1]) / hop_s)
+        if i < len(f0_track) - 1 and voiced_mask[i + 1]:
+            local.append(abs(midi[i + 1] - midi[i]) / hop_s)
+        if local:
+            speed[i] = max(local)
+    return speed
+
+
+def pitch_class_histogram_stable(f0_track: np.ndarray, hop_s: float, ref_freq: float = 440.0,
+                                  glide_threshold: float = 8.0) -> np.ndarray:
+    """Like pitch_class_histogram(), but drops samples mid-glide (local speed
+    above glide_threshold semitones/sec). Samples with no measurable local
+    speed (isolated single-frame voiced runs) are kept, not dropped, since
+    there's no evidence they're transitional."""
+    voiced = f0_track > 0
+    if not np.any(voiced):
+        return np.zeros(12)
+    speed = _voiced_pitch_velocity(f0_track, hop_s, ref_freq)
+    stable = voiced & (np.isnan(speed) | (speed < glide_threshold))
+    return pitch_class_histogram(f0_track[stable], ref_freq)
+
+
+def scale_features_stable(sound: parselmouth.Sound, hop_s: float = 0.02,
+                           glide_threshold: float = 8.0) -> dict:
+    pitch = sound.to_pitch(time_step=hop_s)
+    f0_track = pitch.selected_array["frequency"]
+    histogram = pitch_class_histogram_stable(f0_track, hop_s, glide_threshold=glide_threshold)
+
+    major_fit = _best_rotation_correlation(histogram, _MAJOR_PROFILE)
+    minor_fit = _best_rotation_correlation(histogram, _MINOR_PROFILE)
+    wholetone_fit = _best_rotation_correlation(histogram, _WHOLETONE_PROFILE)
+
+    nonzero = histogram[histogram > 0]
+    entropy = -np.sum(nonzero * np.log2(nonzero)) if len(nonzero) else 0.0
+    tonal_clarity = 1 - entropy / np.log2(12)
+
+    voiced = f0_track > 0
+    speed = _voiced_pitch_velocity(f0_track, hop_s) if np.any(voiced) else np.array([])
+    stable_frac = float(np.mean(np.isnan(speed) | (speed < glide_threshold))) if np.any(voiced) else np.nan
+
+    return {
+        "major_fit_stable": major_fit,
+        "minor_fit_stable": minor_fit,
+        "wholetone_fit_stable": wholetone_fit,
+        "majorness_stable": major_fit - minor_fit,
+        "tonal_clarity_stable": float(tonal_clarity),
+        "stable_pitch_fraction": stable_frac,
     }
 
 
@@ -719,9 +863,11 @@ def extract_all_features(path: str) -> dict:
         sound = sound.convert_to_mono()
     features = {}
     features.update(prosody_features(sound))
+    features.update(jitter_shimmer_stable_features(sound))
     features.update(rhythm_features(sound))
     features.update(harmony_features(sound))
     features.update(scale_features(sound))
+    features.update(scale_features_stable(sound))
     features.update(melody_contour_features(sound))
     features.update(melodic_interval_features(sound))
     features.update(rhythm_pattern_features(sound))
@@ -980,3 +1126,74 @@ if __name__ == "__main__":
     pressed = sum((1.0 / h) * np.sin(2 * np.pi * h * f0 * t) for h in range(1, 8))
     print(f"H1-H2 (breathy)  = {_h1_h2(breathy, sr, f0):.2f} dB")
     print(f"H1-H2 (pressed)  = {_h1_h2(pressed, sr, f0):.2f} dB  (expect lower/more negative than breathy)")
+
+    # Sanity check: a clean C-major arpeggio (C4-E4-G4-C4, held notes) with
+    # fast chromatic "excursion" glides between the notes -- pitch that
+    # briefly sweeps up to an off-scale frequency and back down before
+    # landing on the next note. The held notes are strongly C-major; the
+    # glides pass through many off-scale pitch classes at high speed. The
+    # naive (all-samples) scale-fit should be diluted by the glide content;
+    # the glide-excluded version should recover a cleaner major-key fit.
+    print()
+    print("=== Glide-exclusion sanity check: C-major arpeggio diluted by chromatic sweeps ===")
+    sr = 16000
+    note_freqs = [261.63, 329.63, 392.00, 261.63]  # C4, E4, G4, C4
+    note_dur, glide_dur = 0.20, 0.20
+    off_grid_ratio = 1.68  # arbitrary non-semitone multiplier -> spreads glide across many pitch classes
+    segments = []
+    for i, f in enumerate(note_freqs):
+        segments.append(np.full(int(note_dur * sr), f))
+        if i < len(note_freqs) - 1:
+            excursion = f * off_grid_ratio
+            half = int(glide_dur * sr / 2)
+            segments.append(np.linspace(f, excursion, half))
+            segments.append(np.linspace(excursion, note_freqs[i + 1], half))
+    freq_track = np.concatenate(segments)
+    t = np.arange(len(freq_track)) / sr
+    phase = 2 * np.pi * np.cumsum(freq_track) / sr
+    y = np.sin(phase)
+    glide_path = "/private/tmp/claude-501/-Users-minjoolee-Downloads-MUStARD/c8ce0015-f13f-4958-aeaa-1445bff3da93/scratchpad/_glide_scale_sanity.wav"
+    sf.write(glide_path, y, sr)
+    sound = parselmouth.Sound(glide_path)
+    naive = scale_features(sound)
+    stable = scale_features_stable(sound)
+    print(f"naive  major_fit={naive['major_fit']:.3f}  tonal_clarity={naive['tonal_clarity']:.3f}")
+    print(f"stable major_fit={stable['major_fit_stable']:.3f}  tonal_clarity={stable['tonal_clarity_stable']:.3f}  "
+          f"(expect both higher than naive)")
+    print(f"stable_pitch_fraction={stable['stable_pitch_fraction']:.3f} (fraction of frames kept as non-glide)")
+
+    # Sanity check: jitter_local/shimmer_local are meant to measure
+    # cycle-to-cycle perturbation in an otherwise steady voice. A near-steady
+    # tone with a single fast glide inserted (only ~14% of total duration)
+    # should not genuinely have 10x higher jitter -- if it does, that's the
+    # glide itself being misread as perturbation, which jitter_local_stable
+    # should fix by excluding the glide's time range from the measurement.
+    print()
+    print("=== Glide-exclusion sanity check: jitter/shimmer contamination ===")
+
+    def make_jitter_test_signal(with_glide, sr=16000):
+        rng = np.random.default_rng(1)
+        f0_base = 200.0
+        n_stable = int(0.6 * sr)
+        micro_jitter = 1 + rng.normal(0, 0.003, n_stable)
+        freq_track_stable = f0_base * micro_jitter
+        if with_glide:
+            n_glide = int(0.1 * sr)
+            glide = np.linspace(f0_base, f0_base * 1.8, n_glide)
+            freq_track = np.concatenate(
+                [freq_track_stable[: n_stable // 2], glide, freq_track_stable[n_stable // 2:]])
+        else:
+            freq_track = freq_track_stable
+        phase = 2 * np.pi * np.cumsum(freq_track) / sr
+        return 0.5 * np.sin(phase) + 0.2 * np.sin(2 * phase) + 0.1 * np.sin(3 * phase), sr
+
+    for label, with_glide in [("no glide (baseline)", False), ("with fast glide", True)]:
+        y, sr2 = make_jitter_test_signal(with_glide)
+        path = (f"/private/tmp/claude-501/-Users-minjoolee-Downloads-MUStARD/c8ce0015-f13f-4958-aeaa-1445bff3da93/"
+                f"scratchpad/_jitter_fix_{'glide' if with_glide else 'base'}.wav")
+        sf.write(path, y, sr2)
+        sound = parselmouth.Sound(path)
+        naive = prosody_features(sound)
+        fixed = jitter_shimmer_stable_features(sound)
+        print(f"{label:<22} naive jitter={naive['jitter_local']:.5f}  stable jitter={fixed['jitter_local_stable']:.5f}")
+    print("(expect: naive jitter jumps a lot with the glide; stable jitter stays close to the baseline)")

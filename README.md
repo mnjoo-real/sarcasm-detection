@@ -382,6 +382,49 @@ A full episode-ANCOVA re-screen on the 11,021-item corpus found 39/44 features i
 episode-control — plausible given the much larger n makes small effect sizes detectable, so the classifier
 result above (not the raw significance count) is the trustworthy part of this finding.
 
+### Phase 11 — Fixing glissando contamination (scale-fit, then jitter/shimmer)
+
+Speech pitch glides continuously between targets rather than landing on discrete notes like an instrument does
+— exactly the caveat noted since Phase 1 for the major/minor key-fit features. This phase asks concretely: can
+that be fixed, and does anything else in the feature set have the same problem?
+
+**Fix: exclude glide frames from the pitch-class histogram.** Added `scale_features_stable()`
+(`harmonic_features.py`) — estimates local pitch velocity (semitones/sec between consecutive voiced frames,
+reusing the same 8 semitones/sec threshold `segment_notes()` already used for note-segmentation) and excludes
+samples above it before building the histogram major/minor/wholetone-fit correlate against. Sanity-checked with
+a synthesized C-major arpeggio whose notes are diluted by fast chromatic "excursion" glides between them: the
+naive histogram's `tonal_clarity` was 0.174, the glide-excluded version recovered 0.587 (target notes are
+genuinely there; the glides were just burying them).
+
+**Auditing the rest of the feature set for the same problem**: `dissonance`/`inharmonicity` compute from a short
+40ms FFT window per frame — a synthetic test (steady tone + one fast glide covering 14% of duration) moved their
+means by <2%, so short-window spectral features aren't meaningfully affected. `segment_notes` /
+`melodic_interval_features` already had this exact velocity-threshold guard built in from the start (that's
+where the 8 semitones/sec threshold reused above actually came from). But the same synthetic test found
+**`jitter_local`/`shimmer_local` inflate ~11x/~9x** from that one glide alone — Praat's own period-ratio guard
+(excludes pairs >1.3x) doesn't fully protect them. Added `jitter_shimmer_stable_features()`: restricts the same
+Praat "Get jitter/shimmer (local)" calls to only the glide-excluded stable time ranges, duration-weighted across
+segments. The same synthetic test confirms the fix: stable jitter stays at 0.00031 with or without the glide,
+vs. naive jitter's 0.00032 → 0.00356 jump.
+
+**Real-data validation, both fixes, independently in both corpora:**
+
+| | MUStARD (LOSO) | PodSarc-hard (GroupKFold) | PodSarc-full (GroupKFold) |
+|---|---|---|---|
+| baseline | 0.607 | 0.545 | 0.611 – 0.622 |
+| + 6 stable-scale features | **0.613** | 0.549 (noise) | no change |
+| + 2 stable-jitter/shimmer (added, not swapped) | **0.617** (new best) | 0.549 (noise) | no change |
+
+MUStARD is where both fixes pay off — `tonal_clarity_stable` is a much cleaner statistical signal than the
+naive version (ANCOVA p=0.0005 → p<0.0001), and the previously-rejected naive scale features (which *hurt* when
+added, F1=0.595) now help once glide is excluded, confirming the mechanism fixed the actual problem rather than
+just adding noise. Swapping jitter/shimmer for their stable versions (instead of adding both) makes MUStARD
+*worse* (0.598) — the glide-contaminated original apparently still carried some real information the classifier
+was using, so the fix is additive value, not a strict correction. PodSarc shows the same statistical improvement
+pattern (`major_fit_stable` becomes significant, p=0.75→0.044) but no classifier movement in either subset —
+consistent with the recurring finding that a feature's group-controlled significance and its multivariate
+classifier value are separate questions, and that which features matter is domain-specific.
+
 ### Lessons that generalized across the whole exploration
 
 1. **Random CV lies here.** Every "improvement" was re-checked show-independent before being believed; several
@@ -424,6 +467,12 @@ result above (not the raw significance count) is the trustworthy part of this fi
 14. **A small-sample pattern can be an artifact of the sample size, not the features.** "More features hurt"
     held reliably from Phase 1 through Phase 9 (~700-2,900 items) and then nearly vanished at 11,021 items —
     a conclusion that looked like a stable law was partly overfitting risk scaling with n.
+15. **A named caveat is a lead, not just a disclaimer.** "Speech pitch glides continuously" was written down as
+    a limitation back in Phase 1 and left alone for ten phases. Actually acting on it found a real fix (scale-fit)
+    and a previously-unknown problem in a feature used since Phase 1 (jitter/shimmer, 11x inflated by one glide).
+16. **A theoretically-correct fix doesn't have to replace the thing it fixes.** Swapping glide-contaminated
+    jitter/shimmer for the corrected version made MUStARD worse; adding the correction *alongside* the original
+    gave the best result of the whole project. The contaminated signal still carried real information.
 
 ### Files
 
@@ -472,4 +521,8 @@ result above (not the raw significance count) is the trustworthy part of this fi
 | `convert_podsarc_agreed_audio.py` | Phase 10: mp3→wav conversion (via bundled `imageio_ffmpeg`) for the 8,139 LLM-agreed PodSarc utterances |
 | `data/podsarc_labels_agreed.csv` | Phase 10: the 8,139 LLM-agreed utterances (sarcasm = the agreed GPT-4o/Llama3 label) |
 | `data/podsarc_harmonic_features_agreed.csv` | Phase 10: harmonic/formant/voice-quality features (45 cols) for the 8,139 agreed utterances |
-| `data/podsarc_harmonic_features_full.csv` | Phase 10: the full 11,021-utterance corpus (disagreement + agreed subsets combined, tagged by `subset`) |
+| `data/podsarc_harmonic_features_full.csv` | Phase 10/11: the full 11,021-utterance corpus (disagreement + agreed subsets combined, tagged by `subset`), including the Phase 11 stable-scale and stable-jitter/shimmer columns |
+| `extract_stable_scale_only.py` | Phase 11: fast incremental extraction of just the 6 glide-excluded scale features (skips the full 45-feature pipeline) |
+| `extract_stable_jitter_shimmer_only.py` | Phase 11: fast incremental extraction of just the glide-excluded jitter/shimmer features |
+| `data/podsarc_stable_scale.csv`, `data/podsarc_stable_scale_agreed.csv` | Phase 11: `scale_features_stable()` output for the hard-subset and agreed PodSarc utterances |
+| `data/podsarc_stable_jitter_shimmer.csv`, `data/podsarc_stable_jitter_shimmer_agreed.csv` | Phase 11: `jitter_shimmer_stable_features()` output for the hard-subset and agreed PodSarc utterances |
