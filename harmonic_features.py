@@ -584,6 +584,135 @@ def melodic_interval_features(sound: parselmouth.Sound, hop_s: float = 0.02,
     }
 
 
+# --- Formants (articulation) -------------------------------------------------
+# Vocal-tract resonances (F1/F2/F3) -- an articulation axis this project
+# hasn't touched at all: pitch (F0), timbre (dissonance/MFCC), and rhythm are
+# already covered, but not "how exaggerated or constrained is the mouth
+# shape." A wider or more variable formant spread could mark exaggerated
+# articulation used for comic delivery.
+
+def formant_features(sound: parselmouth.Sound, hop_s: float = 0.01) -> dict:
+    formant = sound.to_formant_burg()
+    duration = sound.get_total_duration()
+    times = np.arange(0, duration, hop_s)
+
+    f1_vals, f2_vals, f3_vals = [], [], []
+    for t in times:
+        f1 = formant.get_value_at_time(1, t)
+        f2 = formant.get_value_at_time(2, t)
+        f3 = formant.get_value_at_time(3, t)
+        if f1 is not None and not np.isnan(f1):
+            f1_vals.append(f1)
+        if f2 is not None and not np.isnan(f2):
+            f2_vals.append(f2)
+        if f3 is not None and not np.isnan(f3):
+            f3_vals.append(f3)
+
+    def stats(vals, name):
+        if not vals:
+            return {f"{name}_mean": np.nan, f"{name}_std": np.nan}
+        return {f"{name}_mean": float(np.mean(vals)), f"{name}_std": float(np.std(vals))}
+
+    result = {}
+    result.update(stats(f1_vals, "f1"))
+    result.update(stats(f2_vals, "f2"))
+    result.update(stats(f3_vals, "f3"))
+
+    # Formant dispersion: average adjacent-formant spacing, a standard proxy
+    # for vocal-tract length / how open the articulatory setting is.
+    n = min(len(f1_vals), len(f2_vals), len(f3_vals))
+    if n > 0:
+        f1a, f2a, f3a = np.array(f1_vals[:n]), np.array(f2_vals[:n]), np.array(f3_vals[:n])
+        result["formant_dispersion"] = float(np.mean([(f2a - f1a).mean(), (f3a - f2a).mean()]))
+    else:
+        result["formant_dispersion"] = np.nan
+    return result
+
+
+# --- Voice quality: CPP and spectral tilt (H1-H2) ----------------------------
+# More specific voice-quality measures than HNR: Cepstral Peak Prominence
+# (CPP) is widely considered the more robust clinical/research standard for
+# periodicity strength, and H1-H2 (spectral tilt between the first two
+# harmonics) directly targets breathy-vs-pressed vocal effort, rather than
+# HNR's coarser harmonic-vs-noise split.
+
+def _cepstral_peak_prominence(frame: np.ndarray, sr: int, f0_min: float = 60.0,
+                               f0_max: float = 400.0) -> float:
+    windowed = frame * np.hanning(len(frame))
+    spectrum = np.abs(np.fft.rfft(windowed))
+    log_spectrum = np.log(spectrum + 1e-10)
+    cepstrum = np.fft.irfft(log_spectrum)
+
+    quefrency = np.arange(len(cepstrum)) / sr
+    min_q, max_q = 1.0 / f0_max, 1.0 / f0_min
+    valid = (quefrency >= min_q) & (quefrency <= max_q)
+    if not np.any(valid):
+        return np.nan
+
+    valid_idx = np.where(valid)[0]
+    peak_idx = valid_idx[np.argmax(cepstrum[valid_idx])]
+    peak_val = cepstrum[peak_idx]
+
+    fit_range = (quefrency > 1e-3) & (quefrency < max_q * 1.5)
+    if np.sum(fit_range) < 2:
+        return np.nan
+    coeffs = np.polyfit(quefrency[fit_range], cepstrum[fit_range], 1)
+    trend_at_peak = np.polyval(coeffs, quefrency[peak_idx])
+    return float(peak_val - trend_at_peak)
+
+
+def _h1_h2(frame: np.ndarray, sr: int, f0: float, tol_hz: float = 20.0) -> float:
+    if f0 <= 0:
+        return np.nan
+    windowed = frame * np.hanning(len(frame))
+    spectrum = np.abs(np.fft.rfft(windowed))
+    freqs = np.fft.rfftfreq(len(frame), d=1.0 / sr)
+
+    def amp_near(target_freq):
+        idx = np.argmin(np.abs(freqs - target_freq))
+        return spectrum[idx]
+
+    h1, h2 = amp_near(f0), amp_near(2 * f0)
+    if h1 <= 0 or h2 <= 0:
+        return np.nan
+    return float(20 * np.log10(h1) - 20 * np.log10(h2))
+
+
+def voice_quality_features(sound: parselmouth.Sound, frame_length_s: float = 0.04,
+                            hop_s: float = 0.02) -> dict:
+    y = sound.values[0]
+    sr = int(sound.sampling_frequency)
+
+    pitch = sound.to_pitch(time_step=hop_s)
+    f0_track = pitch.selected_array["frequency"]
+    times = pitch.ts()
+
+    frame_len = int(frame_length_s * sr)
+    cpps, h1h2s = [], []
+
+    for t, f0 in zip(times, f0_track):
+        if f0 <= 0:
+            continue
+        center = int(t * sr)
+        start, end = center - frame_len // 2, center + frame_len // 2
+        if start < 0 or end > len(y):
+            continue
+        frame = y[start:end]
+        cpps.append(_cepstral_peak_prominence(frame, sr))
+        h1h2s.append(_h1_h2(frame, sr, f0))
+
+    def stats(values, name):
+        values = [v for v in values if not np.isnan(v)]
+        if not values:
+            return {f"{name}_mean": np.nan, f"{name}_std": np.nan}
+        return {f"{name}_mean": float(np.mean(values)), f"{name}_std": float(np.std(values))}
+
+    result = {}
+    result.update(stats(cpps, "cpp"))
+    result.update(stats(h1h2s, "h1h2"))
+    return result
+
+
 def extract_all_features(path: str) -> dict:
     sound = parselmouth.Sound(path)
     if sound.get_number_of_channels() > 1:
@@ -597,6 +726,8 @@ def extract_all_features(path: str) -> dict:
     features.update(melodic_interval_features(sound))
     features.update(rhythm_pattern_features(sound))
     features.update(pitch_stress_contrast_features(sound))
+    features.update(formant_features(sound))
+    features.update(voice_quality_features(sound))
     return features
 
 
@@ -796,3 +927,56 @@ if __name__ == "__main__":
     filtered = [d for d in mixed if d >= 0.10]
     print(f"raw rpvi_pause (mixed)      = {_rpvi(mixed):.4f}")
     print(f"filtered rpvi_pause (>=100ms) = {_rpvi(filtered):.4f}  (expected: reflects only {real_pauses})")
+
+    # Sanity check: formants. Synthesize a vowel via a cascade of resonant
+    # filters (source-filter model) at known formant frequencies and confirm
+    # formant_features recovers values close to what was actually built in.
+    print()
+    print("=== Formant sanity check: synthetic vowel with known F1/F2/F3 ===")
+    import scipy.signal as sig
+    import soundfile as sf
+
+    def synth_vowel(f0, formants, bandwidths, duration, sr):
+        n = int(duration * sr)
+        source = np.zeros(n)
+        period = max(int(sr / f0), 1)
+        source[::period] = 1.0
+        y = source.copy()
+        for f, bw in zip(formants, bandwidths):
+            r = np.exp(-np.pi * bw / sr)
+            theta = 2 * np.pi * f / sr
+            a1, a2 = 2 * r * np.cos(theta), -r ** 2
+            y = sig.lfilter([1 - a1 - a2], [1, -a1, -a2], y)
+        return y / (np.max(np.abs(y)) + 1e-9) * 0.8
+
+    sr = 16000
+    target_formants = [700, 1220, 2600]  # approx an "ah"-like vowel
+    y = synth_vowel(f0=120, formants=target_formants, bandwidths=[80, 90, 120], duration=0.6, sr=sr)
+    path = "/private/tmp/claude-501/-Users-minjoolee-Downloads-MUStARD/c8ce0015-f13f-4958-aeaa-1445bff3da93/scratchpad/_formant_sanity.wav"
+    sf.write(path, y, sr)
+    sound = parselmouth.Sound(path)
+    f_feats = formant_features(sound)
+    print(f"target F1/F2/F3 = {target_formants}")
+    print(f"recovered: F1={f_feats['f1_mean']:.0f}  F2={f_feats['f2_mean']:.0f}  F3={f_feats['f3_mean']:.0f}")
+
+    # Sanity check: CPP should be high for a clean periodic tone and near-zero
+    # (no prominent cepstral peak) for white noise.
+    print()
+    print("=== CPP sanity check: periodic tone vs white noise ===")
+    t = np.arange(int(0.05 * sr)) / sr
+    f0_test = 150
+    periodic_frame = sum(np.sin(2 * np.pi * h * f0_test * t) / h for h in range(1, 15))
+    rng = np.random.default_rng(0)
+    noise_frame = rng.normal(0, 1, len(t))
+    print(f"CPP (periodic tone) = {_cepstral_peak_prominence(periodic_frame, sr):.3f}")
+    print(f"CPP (white noise)   = {_cepstral_peak_prominence(noise_frame, sr):.3f}  (expect much lower)")
+
+    # Sanity check: H1-H2 should be larger (more positive) for a breathy
+    # harmonic profile (steep falloff) than a pressed one (flatter falloff).
+    print()
+    print("=== H1-H2 sanity check: breathy vs pressed harmonic profile ===")
+    f0 = 150
+    breathy = sum((1.0 / (h ** 2.5)) * np.sin(2 * np.pi * h * f0 * t) for h in range(1, 8))
+    pressed = sum((1.0 / h) * np.sin(2 * np.pi * h * f0 * t) for h in range(1, 8))
+    print(f"H1-H2 (breathy)  = {_h1_h2(breathy, sr, f0):.2f} dB")
+    print(f"H1-H2 (pressed)  = {_h1_h2(pressed, sr, f0):.2f} dB  (expect lower/more negative than breathy)")

@@ -188,6 +188,12 @@ model (arousal with `energy_std`/`speaking_rate_proxy`, dominance with `f0_mean`
 
 ### Phase 6 — Does any of this survive leaving MUStARD entirely? (PodSarc)
 
+> **Correction (Phase 10):** everything in this section was run on a 2,885-utterance subset that turned out to
+> be exactly the cases GPT-4o and Llama3 *disagreed* on — not a representative sample of PodSarc. See
+> [Phase 10](#phase-10--the-podsarc-hard-subset-discovery) for the full
+> 11,021-utterance re-run; the qualitative "does the model transfer" conclusions below still hold, but the
+> absolute F1 numbers were measured on PodSarc's *hardest* cases and understate performance on the full corpus.
+
 The real test: **PodSarc** (podcast sarcasm, ~11k utterances from *Overly Sarcastic Productions*, GPT-4o +
 Llama3 sarcasm labels with human arbitration on disagreements — 2,885 human-verified utterances used here).
 Completely different domain: natural conversational co-hosts, not scripted TV performance; clips average
@@ -248,6 +254,134 @@ dissonance/pitch/rhythm were picking up on), while hyperbole is usually already 
 ("a million times") and doesn't need one — a genuine negative result that sharpens *why* irony is acoustically
 marked and hyperbole isn't, rather than a failure to find something that should have been there.
 
+### Phase 7 — Generic spectral features: do MFCC and mel-spectrograms help?
+
+Deliberately deferred CNN/deep-learning approaches; instead tested classical summary-statistic MFCC (28-dim) and
+mel-spectrogram (80-dim, 40 bands, mean+std per band) features (`extract_mfcc_features.py`,
+`extract_melspec_features.py`) as an addition to each corpus's already-validated feature set
+(`train_with_mfcc.py`, `train_with_spectral.py`):
+
+| Addition | MUStARD (baseline F1=0.607, LOSO) | PodSarc (baseline F1=0.545, GroupKFold) |
+|---|---|---|
+| + MFCC (28) | 0.556 | 0.559 |
+| + mel-spectrogram (80) | 0.587 | 0.559 |
+| + both | 0.550 | 0.551 |
+
+Generic spectral features hurt MUStARD and help PodSarc a little — but never as much as, and redundantly with,
+the curated feature set (combining MFCC+mel-spec together is *worse* than either alone in both corpora, since
+they overlap heavily as descriptions of the same spectral envelope).
+
+**Cosine-similarity check** (`analyze_mfcc_similarity.py`): raw MFCC vectors are nearly identical between
+sarcastic and non-sarcastic classes in both corpora (separability gap ≈0.0001 — dominated by speaker/recording
+identity, not sarcasm). Per-show/episode normalization flips the centroid correlation to -1.0 but the
+separability gap stays tiny (0.0235 MUStARD, 0.0121 PodSarc) — confirming there's no meaningful class structure
+in raw spectral-envelope space, consistent with the classifier result above.
+
+### Phase 8 — Formants and voice quality (F1/F2/F3, CPP, H1-H2 spectral tilt)
+
+Two previously-unexplored acoustic dimensions, added together (`harmonic_features.py`'s `formant_features()` and
+`voice_quality_features()`): **formants** (F1/F2/F3 mean+std via Praat, plus formant dispersion — articulatory
+"openness"/vocal-tract-length proxy) and **voice quality** (Cepstral Peak Prominence for periodicity strength,
+H1-H2 spectral tilt for breathy-vs-pressed phonation).
+
+Sanity-checked against synthesized signals before trusting on real data: a source-filter synthesized vowel
+(target F1/F2/F3 = 700/1220/2600 Hz) recovered 730/1216/2088 Hz; a 14-harmonic periodic tone gave CPP=0.378 vs.
+0.056 for white noise (the first attempt, with only 2 harmonics, failed to separate — cepstral peaks need a
+richer harmonic stack to show up); a breathy (1/h^2.5 harmonic falloff) vs. pressed (1/h) synthetic voice gave
+H1-H2 = 13.63 dB vs. 4.60 dB.
+
+**Statistical validation** (`analyze_formant_voice_quality.py`, pooled Mann-Whitney + show/episode-ANCOVA, run
+independently per corpus — PodSarc's screen does not reuse MUStARD's selections):
+
+| Survives group-control | MUStARD (of 11) | PodSarc-hard-subset (of 11) |
+|---|---|---|
+| | `f1_mean`, `f2_mean`, `f3_mean`, `f3_std`, `formant_dispersion`, `h1h2_mean`, `h1h2_std` (7) | `f1_mean`, `f3_mean`, `cpp_mean`, `cpp_std`, `h1h2_std` (5) |
+
+`f1_mean`, `f3_mean`, and the H1-H2 tilt validate **independently in both corpora** — the first cross-corpus-
+replicated feature family found outside the original 20/15-feature sets.
+
+**Classifier impact — the pattern repeats a 5th time**: despite being genuinely significant, adding these
+features (validated-only, or all 11 regardless of significance) reduces held-out F1 in both corpora:
+
+| | baseline | + validated only | + all 11 |
+|---|---|---|---|
+| MUStARD (LOSO) | 0.607 | 0.584 (7 feats) | 0.590 |
+| PodSarc-hard (GroupKFold) | 0.545 | 0.536 (5 feats) | 0.537 |
+
+Statistical significance and multivariate classifier value are, once again, different questions — this makes it
+five separate feature families (MFCC, mel-spectrogram, the full 33-feature PodSarc set, and now formants/voice
+quality) where "passes the group-controlled test" did not translate into "improves the SVM."
+
+### Phase 9 — Ellipse/QDA regions in V-A-D space (Han & Cha 2017)
+
+A Korean paper on extending Russell's Circumplex Model represents emotion categories as bivariate-Gaussian
+confidence ellipses in Valence-Arousal space with a Bayesian/QDA decision boundary between them
+(`analyze_vad_ellipse.py`: `ellipse_params()` follows the paper's rotation-from-covariance / semi-axes-from-std
+construction exactly; `evaluate_qda_lda()` fits sklearn's QDA/LDA — mathematically the same generative
+classifier — under the same show/episode-grouped held-out protocol used throughout, not the paper's own
+in-sample accuracy figure). Applied as an independent, generative-model cross-check of the discriminative
+ANCOVA conclusions, using the existing wav2vec2 V-A-D features.
+
+**Sarcastic vs. non-sarcastic**: MUStARD LDA F1=0.630, QDA F1=0.567 (QDA in-sample, paper-style: 0.661);
+PodSarc(700-sample) LDA F1=0.468, QDA F1=0.516 (in-sample 0.607) — no improvement over the acoustic-feature
+SVMs, and the ellipses visibly overlap in both corpora (`data/mustard_vad_ellipse.png`, `data/podsarc_vad_ellipse.png`).
+
+**Sarcasm-subtype ellipses** (do quadrants/octants occupy separable V-A-D regions?): required extending
+MUStARD's 2-axis judgments to a 3rd (proportionate/hyperbolic) axis, mirroring what PodSarc needed in Phase 6
+— all 345 sarcastic utterances re-judged and cross-checked against the existing 2-axis labels with zero
+mismatches (`mustard_quadrant_labels.py`). Every axis/corpus combination shows the same near-total overlap:
+
+| Comparison | n | Centroid distances (Euclidean, V-A-D) |
+|---|---|---|
+| MUStARD Q1-4 (2-axis) | 345 | 0.009 – 0.047 |
+| MUStARD octants (3-axis, new) | 345 (287 plottable) | 0.011 – 0.083 |
+| PodSarc octants (3-axis) | 287 (247 plottable) | 0.029 – 0.062 |
+| PodSarc Q1-4 (collapsed to 2-axis) | 287 (276 plottable) | 0.037 |
+
+Two structurally different methods (discriminative ANCOVA, generative ellipse/QDA) now agree, in both corpora,
+at both axis granularities: fine-grained sarcasm subtypes are not acoustically separable in V-A-D space. That
+convergence across independent methods is what makes this a trustworthy negative result rather than one
+technique's blind spot.
+
+### Phase 10 — The PodSarc hard-subset discovery
+
+While preparing to test more feature combinations, a direct question exposed a problem with every PodSarc
+result up to this point: **how much of PodSarc were we actually using?** The `llms_annotations_with_human_check.json`
+annotation file covers all 11,024 utterances across the same 30 episodes used throughout — but
+`data/podsarc_labels.csv` (the file every PodSarc script reads) has only 2,885 rows.
+
+Checking the selection: GPT-4o and Llama3 agree on 8,139/11,024 utterances (73.8%) and disagree on exactly
+2,885 — and the 2,885 in our dataset are precisely that disagreement set, human-arbitrated (`human_check`
+field). **Every PodSarc result in Phases 6-9 was measured on the hardest 26% of the corpus** — the cases where
+two different LLMs, given the same text, actively disagreed — not a representative sample.
+
+Extracted the remaining 8,139 "LLM-agreed" utterances: converted mp3→wav (`convert_podsarc_agreed_audio.py`,
+via the bundled `imageio_ffmpeg` binary, matching the existing 22050Hz mono format) and ran the full 45-feature
+harmonic+formant+voice-quality extraction (checkpointed, ~2.5 hours, 8,139/8,139 succeeded). Combined with the
+existing hard subset into a full 11,021-utterance corpus (`data/podsarc_harmonic_features_full.csv`, 30
+episodes, 36.5% sarcastic).
+
+**Classifier re-evaluation, full corpus vs. hard-subset-only (GroupKFold by episode):**
+
+| Feature set | Hard subset only (n=2,882) | Full corpus (n=11,021) |
+|---|---|---|
+| MUStARD-20 | 0.538 | **0.621** |
+| PodSarc-validated-15 | 0.541 | **0.611** |
+| All 44 features | 0.533 | **0.622** |
+
+PodSarc's F1 ceiling (~0.54, throughout Phases 6-9) was not a fundamental acoustic-feature limitation — it was
+an artifact of evaluating exclusively on the cases two different LLMs couldn't agree on. On the full corpus,
+harmonic/melody/rhythm/formant features perform comparably to (marginally above) MUStARD's own LOSO F1=0.607.
+
+Also notable: on the full corpus, "all 44 features" (0.622) very slightly *beats* the curated 20-feature set
+(0.621) — the "more features hurt" pattern from Phases 1-9 weakens with an order of magnitude more training
+data, suggesting it was partly a small-sample overfitting artifact specific to the ~2,900-item hard subset, not
+a universal law about these features.
+
+A full episode-ANCOVA re-screen on the 11,021-item corpus found 39/44 features individually significant after
+episode-control — plausible given the much larger n makes small effect sizes detectable, so the classifier
+result above (not the raw significance count) is the trustworthy part of this finding.
+
 ### Lessons that generalized across the whole exploration
 
 1. **Random CV lies here.** Every "improvement" was re-checked show-independent before being believed; several
@@ -279,6 +413,17 @@ marked and hyperbole isn't, rather than a failure to find something that should 
 11. **Not every sarcasm marker needs a matching acoustic marker.** Irony (literal-meaning flip) is acoustically
     loud because the mismatch has to be signaled somehow; hyperbole (scale exaggeration) can be entirely lexical
     and still read as sarcastic. A clean null result on the hyperbole axis is informative, not a dead end.
+12. **Statistical significance and classifier value kept being different questions, five separate times**
+    (MFCC, mel-spectrogram, the full 33-feature PodSarc set, formants, voice quality). A feature surviving
+    group-controlled ANCOVA is necessary but nowhere near sufficient evidence it belongs in the model.
+13. **Always check what a filtered dataset was actually filtered by.** PodSarc's 2,885-row label file looked
+    like "the corpus"; it was actually the 26% GPT-4o and Llama3 disagreed on. Every PodSarc conclusion in
+    Phases 6-9 was true, but true about the hardest slice — always confirm a dataset is what it claims to be
+    before trusting conclusions drawn from it, especially when a filename says "human-verified" without saying
+    verified *how* or *which subset*.
+14. **A small-sample pattern can be an artifact of the sample size, not the features.** "More features hurt"
+    held reliably from Phase 1 through Phase 9 (~700-2,900 items) and then nearly vanished at 11,021 items —
+    a conclusion that looked like a stable law was partly overfitting risk scaling with n.
 
 ### Files
 
@@ -308,7 +453,23 @@ marked and hyperbole isn't, rather than a failure to find something that should 
 | `analyze_podsarc_vad_gap.py` | PodSarc replication of the sarcasm-vs-VAD test and the cross-modal gap analysis |
 | `podsarc_quadrant_labels.py` | Manual 3-axis (direct/ironic × friendly/hostile × proportionate/hyperbolic) judgments for PodSarc's 287 sarcastic utterances |
 | `analyze_podsarc_octants.py` | 8-octant breakdown + proportionate-vs-hyperbolic acoustic test |
-| `data/podsarc_labels.csv` | Full PodSarc human-verified label set (2,885 rows: nid, episode, text, sarcasm) |
-| `data/podsarc_labels_sample.csv` | 700-item stratified subsample used for the (slower) wav2vec2 VAD pass |
-| `data/podsarc_harmonic_features.csv` | Harmony/melody/rhythm features for all 2,885 PodSarc utterances |
+| `data/podsarc_labels.csv` | **The GPT-4o/Llama3 disagreement subset only** (2,885 rows, human-arbitrated) — not the full corpus, see Phase 10 |
+| `data/podsarc_labels_sample.csv` | 700-item stratified subsample (of the disagreement subset) used for the (slower) wav2vec2 VAD pass |
+| `data/podsarc_harmonic_features.csv` | Harmony/melody/rhythm/formant/voice-quality features (45 cols) for the 2,885-item disagreement subset |
 | `data/podsarc_audio_vad.csv` | wav2vec2 audio V/A/D for the 700-item PodSarc sample |
+| `extract_melspec_features.py` | Mel-spectrogram summary-stat extraction (80-dim, 40 bands mean+std) |
+| `analyze_mfcc_similarity.py` | Cosine-similarity (centroid + intra/inter-class) check for MFCC vectors, raw vs. group-normalized — `--corpus mustard\|podsarc` |
+| `train_with_mfcc.py` | Phase 7: adds MFCC to each corpus's validated feature set — `--corpus mustard\|podsarc` |
+| `train_with_spectral.py` | Phase 7: adds MFCC, mel-spectrogram, and both together — `--corpus mustard\|podsarc` |
+| `data/mfcc_features.csv`, `data/podsarc_mfcc_features.csv` | MFCC feature tables |
+| `data/melspec_features.csv`, `data/podsarc_melspec_features.csv` | Mel-spectrogram feature tables |
+| `analyze_formant_voice_quality.py` | Phase 8: pooled + show/episode-ANCOVA for formants + CPP/H1-H2, run independently per corpus — `--corpus mustard\|podsarc` |
+| `train_with_formants.py`, `train_with_formants_podsarc.py` | Phase 8: adds validated (and all 11) formant/voice-quality features to each corpus's baseline model |
+| `analyze_vad_ellipse.py` | Phase 9: ellipse-region + QDA/LDA method (Han & Cha 2017) for sarcastic-vs-non-sarcastic in wav2vec2 V-A-D space — `--corpus mustard\|podsarc` |
+| `analyze_vad_ellipse_quadrants.py`, `analyze_vad_ellipse_mustard_octants.py` | Phase 9: MUStARD sarcasm-subtype ellipses, 2-axis and 3-axis |
+| `analyze_vad_ellipse_octants.py`, `analyze_vad_ellipse_podsarc_q1q4.py` | Phase 9: PodSarc sarcasm-subtype ellipses, 3-axis and collapsed-2-axis |
+| `mustard_quadrant_labels.py` | Manual 3-axis judgments (extends `quadrant_labels.py` with proportionate/hyperbolic) for all 345 MUStARD sarcastic utterances |
+| `convert_podsarc_agreed_audio.py` | Phase 10: mp3→wav conversion (via bundled `imageio_ffmpeg`) for the 8,139 LLM-agreed PodSarc utterances |
+| `data/podsarc_labels_agreed.csv` | Phase 10: the 8,139 LLM-agreed utterances (sarcasm = the agreed GPT-4o/Llama3 label) |
+| `data/podsarc_harmonic_features_agreed.csv` | Phase 10: harmonic/formant/voice-quality features (45 cols) for the 8,139 agreed utterances |
+| `data/podsarc_harmonic_features_full.csv` | Phase 10: the full 11,021-utterance corpus (disagreement + agreed subsets combined, tagged by `subset`) |
